@@ -61,6 +61,8 @@ function module.toggle(enable)
 	gifscript.moveVector = nil
 end
 
+warn("pathfinding loaded")
+
 table.insert(gifscript.connections, runService.Heartbeat:Connect(function()
 	warn(module.enabled)
 	if not module.enabled or not char.checkCharacter() then return end
