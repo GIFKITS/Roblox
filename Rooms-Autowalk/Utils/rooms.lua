@@ -15,6 +15,8 @@ local leaveLockerEvent = remotesFolder:WaitForChild("CamLock")
 local playerGui = char.player:WaitForChild("PlayerGui")
 local A90 = playerGui:WaitForChild("MainUI"):WaitForChild("Jumpscare"):WaitForChild("Jumpscare_A90")
 
+-- ROOM --
+
 function module.getCurrentRoom()
 	return currentRoomsFolder:FindFirstChild(latestRoom.Value)
 end
@@ -22,6 +24,8 @@ end
 function module.getDoor()
 	return module.getCurrentRoom():FindFirstChild("Door")
 end
+
+-- LOCKER --
 
 function module.leaveLocker()
 	leaveLockerEvent:FireServer()
@@ -48,12 +52,18 @@ function module.getClosestLocker()
 	return closestLocker
 end
 
+-- OTHER --
+
 function module.checkEntities()
 	return (workspace:FindFirstChild("A60") or workspace:FindFirstChild("A120")) and true or false
 end
 
 function module.checkA90()
 	return A90.Visible
+end
+
+function module.isHiding()
+	return (char.checkCharacter() and char.character:GetAttribute("Hiding")) and true or false
 end
 
 return module
