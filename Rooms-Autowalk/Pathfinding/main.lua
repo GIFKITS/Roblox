@@ -70,7 +70,7 @@ table.insert(gifscript.connections, runService.Heartbeat:Connect(function()
 	lastUpdated = currentTime
 
 	local rootVelocity = char.root.AssemblyLinearVelocity * Vector3.new(1, 0, 1)
-	if rootVelocity.Magnitude < char.humanoid.WalkSpeed / 10 and module.currentlyWalking() then warn("Stuck") module.resetPath(true) end
+	if rootVelocity.Magnitude < char.humanoid.WalkSpeed / 10 and module.currentlyWalking() then module.resetPath(true) end
 
 	module.updateAction()
 	module.computePath()
