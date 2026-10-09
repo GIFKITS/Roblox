@@ -54,8 +54,6 @@ function module.toggle(enable)
 	if enable == module.enabled then return end
 	module.enabled = enable
 
-	warn("toggle", enabled)
-
 	if enable then return end
 	module.resetPath(true)
 	module.currentAction = nil
