@@ -39,7 +39,7 @@ function module.getClosestLocker()
 end
 
 function module.checkEntities()
-	return (workspace:FindFirstChild("A60") and workspace:FindFirstChild("A120")) and true or false
+	return (workspace:FindFirstChild("A60") or workspace:FindFirstChild("A120")) and true or false
 end
 
 return module
