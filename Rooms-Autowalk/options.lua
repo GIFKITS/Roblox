@@ -20,7 +20,7 @@ local lighting = game:GetService("Lighting")
 
 -- Fullbright --
 
-local fullbrightToggle = tabs.main:AddToggle({Title = "Fullbright", Default = false})
+local fullbrightToggle = tabs.main:AddToggle("fullbrightToggle", {Title = "Fullbright", Default = false})
 
 table.insert(gifscript.connections, runService.Heartbeat:Connect(function()
 	if fullbrightToggle.Value then lighting.Ambient = Color3.new(1, 1, 1) end
@@ -28,7 +28,7 @@ end))
 
 -- ANTI AFK --
 
-local antiAfkToggle = tabs.main:AddToggle({Title = "Anti-AFK", Default = false})
+local antiAfkToggle = tabs.main:AddToggle("antiAfkToggle", {Title = "Anti-AFK", Default = false})
 
 table.insert(gifscript.connections, char.player.Idled:Connect(function()
 	if not antiAfkToggle.Value then return end
