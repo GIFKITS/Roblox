@@ -55,11 +55,8 @@ function module.computePath(self)
 	if success and self.path.Status == Enum.PathStatus.Success then
 		self.waypoints = self.path:GetWaypoints()
 		self.waypointIndex = 2
-		warn("success")
 		return
 	end
-
-	warn("error", self.currentAction.name, err, path)
 	
 	self.resetPath(true)
 end
