@@ -1,6 +1,9 @@
 local gifscript = getgenv().gifscript
+if gifscript.unloaded then return end
 
+gifscript.unloaded = true
 gifscript.onUnload:Fire()
+
 gifscript.pathfinding.toggle(false)
 
 for _,connection in pairs(gifscript.connections) do
