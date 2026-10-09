@@ -1,5 +1,5 @@
 local gifscript = getgenv().gifscript
-if gifscript.unloaded then return end
+if not gifscript or gifscript.unloaded then return end
 
 gifscript.unloaded = true
 gifscript.onUnload:Fire()
