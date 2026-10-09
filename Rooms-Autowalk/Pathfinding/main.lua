@@ -11,7 +11,7 @@ module.updateRate = 4
 module.waypoints = {}
 module.waypointIndex = 0
 
-module.agentParams = {AgentRadius = 1, AgentHeight = 5, AgentCanJump = false, WaypointSpacing = 1,}
+module.agentParams = {AgentRadius = 1, AgentHeight = 5, AgentCanJump = false, WaypointSpacing = 2}
 module.path = nil
 module.pathCompleted = false
 
