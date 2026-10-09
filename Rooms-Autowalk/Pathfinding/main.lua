@@ -6,12 +6,12 @@ local char = gifscript.char
 local runService = game:GetService("RunService")
 
 module.enabled = false
-module.updateRate = 4
+module.updateRate = 2
 
 module.waypoints = {}
 module.waypointIndex = 0
 
-module.agentParams = {AgentRadius = 1, AgentHeight = 5, AgentCanJump = false,}
+module.agentParams = {AgentRadius = 1, AgentHeight = 5, AgentCanJump = false, WaypointSpacing = 1,}
 module.path = nil
 module.pathCompleted = false
 
