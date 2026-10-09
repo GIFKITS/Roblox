@@ -1,4 +1,4 @@
-warn("loading...")
+warn("loading rooms")
 local module = {}
 local gifscript = getgenv().gifscript
 local char = gifscript.char
