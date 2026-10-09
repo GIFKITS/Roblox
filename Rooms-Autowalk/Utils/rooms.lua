@@ -12,6 +12,9 @@ local currentRoomsFolder = workspace:WaitForChild("CurrentRooms")
 local remotesFolder = replicatedStorage:WaitForChild("RemotesFolder")
 local leaveLockerEvent = remotesFolder:WaitForChild("CamLock")
 
+local playerGui = char.player
+local A90 = playerGui:WaitForChild("MainUI"):WaitForChild("Jumpscare"):WaitForChild("Jumpscare_A90")
+
 function module.getCurrentRoom()
 	return currentRoomsFolder:FindFirstChild(latestRoom.Value)
 end
@@ -47,6 +50,10 @@ end
 
 function module.checkEntities()
 	return (workspace:FindFirstChild("A60") or workspace:FindFirstChild("A120")) and true or false
+end
+
+function module.checkA90()
+	return A90.Visible
 end
 
 return module
