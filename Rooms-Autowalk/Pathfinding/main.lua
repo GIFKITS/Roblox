@@ -11,7 +11,7 @@ module.updateRate = 4
 module.waypoints = {}
 module.waypointIndex = 0
 
-module.agentParams = {AgentRadius = 1, AgentHeight = 5, AgentCanJump = false, WaypointSpacing = 2}
+module.agentParams = {AgentRadius = 1, AgentHeight = 5, AgentCanJump = false, WaypointSpacing = 1,}
 module.path = nil
 module.pathCompleted = false
 
@@ -53,7 +53,7 @@ end
 function module.toggle(enable)
 	if enable == module.enabled then return end
 	module.enabled = enable
-	
+
 	if enable then return end
 	module.resetPath(true)
 	module.currentAction = nil
@@ -61,20 +61,17 @@ function module.toggle(enable)
 	gifscript.moveVector = nil
 end
 
-warn("pathfinding loaded")
-
 table.insert(gifscript.connections, runService.Heartbeat:Connect(function()
-	warn(module.enabled)
 	if not module.enabled or not char.checkCharacter() then return end
 	module.followWaypoint()
-	
+
 	local currentTime = os.clock()
 	if currentTime - lastUpdated < 1 / module.updateRate then return end
 	lastUpdated = currentTime
-	
+
 	local rootVelocity = char.root.AssemblyLinearVelocity * Vector3.new(1, 0, 1)
 	if rootVelocity.Magnitude < char.humanoid.WalkSpeed / 10 and module.currentlyWalking() then warn("Stuck") module.resetPath(true) end
-	
+
 	module.updateAction()
 	module.computePath()
 end))
