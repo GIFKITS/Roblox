@@ -67,8 +67,6 @@ table.insert(gifscript.connections, runService.Heartbeat:Connect(function()
 	if not module.enabled or not char.checkCharacter() then return end
 	module.followWaypoint()
 
-	warn("enabled")
-
 	local currentTime = os.clock()
 	if currentTime - lastUpdated < 1 / module.updateRate then return end
 	lastUpdated = currentTime
