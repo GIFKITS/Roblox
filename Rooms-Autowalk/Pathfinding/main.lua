@@ -23,8 +23,8 @@ module.actions = {}
 
 local lastUpdated = 0
 
-local actions = loadstring(game:HttpsGet("https://raw.githubusercontent.com/GIFKITS/Roblox/refs/heads/main/Rooms-Autowalk/Pathfinding/actions.lua"))()
-local path = loadstring(game:HttpsGet("https://raw.githubusercontent.com/GIFKITS/Roblox/refs/heads/main/Rooms-Autowalk/Pathfinding/path.lua"))()
+local actions = loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/Roblox/refs/heads/main/Rooms-Autowalk/Pathfinding/actions.lua"))()
+local path = loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/Roblox/refs/heads/main/Rooms-Autowalk/Pathfinding/path.lua"))()
 
 function module.currentlyWalking()
 	return path.currentlyWalking(module)
