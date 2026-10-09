@@ -22,7 +22,7 @@ local lighting = game:GetService("Lighting")
 
 local fullbrightToggle = tabs.main:AddToggle("fullbrightToggle", {Title = "Fullbright", Default = false})
 
-table.insert(gifscript.connections, runService.Heartbeat:Connect(function()
+table.insert(gifscript.connections, runService.RenderStepped:Connect(function()
 	if fullbrightToggle.Value then lighting.Ambient = Color3.new(1, 1, 1) end
 end))
 
