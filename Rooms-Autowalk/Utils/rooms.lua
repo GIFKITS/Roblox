@@ -1,69 +1,83 @@
-local module = {}
+-- SETUP --
+
+getgenv().gifscript = {connections = {}, hooks = {}}
 local gifscript = getgenv().gifscript
-local char = gifscript.char
+
+gifscript.onUnload = Instance.new("BindableEvent")
+gifscript.unloaded = false
+
+-- MODULES --
+
+local char = loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/Roblox/refs/heads/main/Rooms-Autowalk/Utils/char.lua"))()
+gifscript.char = char
+
+local rooms = loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/Roblox/refs/heads/main/Rooms-Autowalk/Utils/rooms.lua"))()
+local move = loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/Roblox/refs/heads/main/Rooms-Autowalk/Utils/move.lua"))()
+
+local pathfinding = loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/Roblox/refs/heads/main/Rooms-Autowalk/Pathfinding/main.lua"))()
+gifscript.pathfinding = pathfinding
+
+-- SERVICES --
 
 local replicatedStorage = game:GetService("ReplicatedStorage")
-local collectionService = game:GetService("CollectionService")
 
-local gameDataFolder = replicatedStorage:WaitForChild("GameData")
-local latestRoom = gameDataFolder:WaitForChild("LatestRoom")
-local currentRoomsFolder = workspace:WaitForChild("CurrentRooms")
+-- UI --
 
-local remotesFolder = replicatedStorage:WaitForChild("RemotesFolder")
-local leaveLockerEvent = remotesFolder:WaitForChild("CamLock")
+local fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local window = fluent:CreateWindow({
+	Title = "Rooms Autowalk",
+	SubTitle = "by gifkits",
+	TabWidth = 160,
+	Size = UDim2.fromOffset(580, 460),
+	Acrylic = false,
+	Theme = "Dark",
+	MinimizeKey = Enum.KeyCode.LeftAlt
+})
+local tabs = {
+	main = window:AddTab({ Title = "Main", Icon = "home" }),
+}
+gifscript.ui = {}
+gifscript.ui.lib = fluent
+gifscript.ui.window = window
+gifscript.ui.tabs = tabs
 
-local playerGui = char.player:WaitForChild("PlayerGui")
-local A90 = playerGui:WaitForChild("MainUI"):WaitForChild("Jumpscare"):WaitForChild("Jumpscare_A90")
+tabs.main:AddButton({Title = "Unload", Description = "unloads script", Callback = function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/Roblox/refs/heads/main/Rooms-Autowalk/unload.lua"))()
+end})
+table.insert(gifscript.connections, fluent.GUI.Destroying:Connect(function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/Roblox/refs/heads/main/Rooms-Autowalk/unload.lua"))()
+end))
 
--- ROOM --
+window:SelectTab(1)
 
-function module.getCurrentRoom()
-	return currentRoomsFolder:FindFirstChild(latestRoom.Value)
-end
+-- PATHFINDING --
 
-function module.getDoor()
-	return module.getCurrentRoom():FindFirstChild("Door")
-end
+tabs.main:AddToggle("pathfindingToggle", {Title = "Pathfinding", Default = false, Callback = function(value)
+	pathfinding.toggle(value)
+	char.collisionEnabled = not value
+	char.frictionEnabled = value
+end})
 
--- LOCKER --
+local actions = {}
 
-function module.leaveLocker()
-	leaveLockerEvent:FireServer()
-end
+actions.door = pathfinding.createAction("door", 1, function()
+	return rooms.isHiding and rooms.getDoor():GetPivot().Position or nil
+end)
 
-function module.getLockerPrompt(locker)
-	return locker:FindFirstChildOfClass("ProximityPrompt")
-end
+actions.locker = pathfinding.createAction("locker", 2, function()
+	if not rooms.checkEntities() or not char.checkCharacter() then return end
+	local locker = rooms.getClosestLocker()
+	return locker and rooms.getLockerVector(locker), locker or nil
+end)
 
-function module.getLockerVector(locker)
-	return locker:FindFirstChild("EnterAttachment", true).WorldPosition
-end
+table.insert(gifscript.connections, actions.locker.pathCompleted:Connect(function(locker)
+	fireproximityprompt(rooms.getLockerPrompt(locker))
+	repeat task.wait() until not rooms.checkEntities() and not rooms.checkA90()
+	rooms.leaveLocker()
+end))
 
-function module.getClosestLocker()
-	if not char.checkCharacter() then return end
-	local closestLocker = nil
-	local closestDistance = math.huge
-	
-	for _,locker in pairs(collectionService:GetTagged("HidingSpot")) do
-		local distance = (char.root.Position - module.getLockerVector(locker)).Magnitude
-		if distance < closestDistance then closestDistance = distance closestLocker = locker end
-	end
-	
-	return closestLocker
-end
+actions.stop = pathfinding.createAction("stop", 3, function()
+	return (rooms.checkA90() and rooms.isHiding()) and Vector3.one * math.huge or nil
+end)
 
--- OTHER --
-
-function module.checkEntities()
-	return (workspace:FindFirstChild("A60") or workspace:FindFirstChild("A120")) and true or false
-end
-
-function module.checkA90()
-	return A90.Visible
-end
-
-function module.isHiding()
-	return (char.checkCharacter() and char.character:GetAttribute("Hiding")) and true or false
-end
-
-return module
+warn("Loaded")
