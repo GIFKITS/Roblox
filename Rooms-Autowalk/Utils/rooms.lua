@@ -1,3 +1,4 @@
+warn("loading...")
 local module = {}
 local gifscript = getgenv().gifscript
 local char = gifscript.char
