@@ -9,12 +9,19 @@ local gameDataFolder = replicatedStorage:WaitForChild("GameData")
 local latestRoom = gameDataFolder:WaitForChild("LatestRoom")
 local currentRoomsFolder = workspace:WaitForChild("CurrentRooms")
 
+local remotesFolder = replicatedStorage:WaitForChild("RemotesFolder")
+local leaveLockerEvent = remotesFolder:WaitForChild("CamLock")
+
 function module.getCurrentRoom()
 	return currentRoomsFolder:FindFirstChild(latestRoom.Value)
 end
 
 function module.getDoor()
 	return module.getCurrentRoom():FindFirstChild("Door")
+end
+
+function module.leaveLocker()
+	leaveLockerEvent:FireServer()
 end
 
 function module.getLockerPrompt(locker)
