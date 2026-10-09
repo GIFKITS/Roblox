@@ -6,7 +6,7 @@ local char = gifscript.char
 local runService = game:GetService("RunService")
 
 module.enabled = false
-module.updateRate = 2
+module.updateRate = 4
 
 module.waypoints = {}
 module.waypointIndex = 0
