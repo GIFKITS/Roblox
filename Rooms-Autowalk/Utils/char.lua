@@ -1,7 +1,9 @@
 local char = {}
 local gifscript = getgenv().gifscript
 
-local player = game:GetService("Players").LocalPlayer
+local runService = game:GetService("RunService")
+local players = game:GetService("Players")
+local player = players.LocalPlayer
 
 char.player = player :: Player?
 
@@ -11,54 +13,27 @@ char.root = nil :: BasePart?
 
 char.collision = nil :: BasePart?
 char.crouchCollision = nil :: BasePart?
-
 char.collisionEnabled = true :: boolean
 
-local collisionConnection = nil :: RBXScriptConnection?
-local crouchCollisionConnection = nil :: RBXScriptConnection?
-
-local function applyCollision()
-	if char.collisionEnabled then return end
-	if char.collision then char.collision.CanCollide = false end
-	if char.crouchCollision then char.crouchCollision.CanCollide = false end
+function char.checkCharacter()
+	return (char.character and char.humanoid and char.root and char.collision and char.crouchCollision) and true or false
 end
 
-function char.checkCharacter(): boolean
-	return char.character ~= nil and char.humanoid ~= nil and char.root ~= nil
+function char.updateCharacter()
+	char.character = player.Character or player.CharacterAdded:Wait()
+	char.humanoid = char.character:FindFirstChildOfClass("Humanoid") or char.character:WaitForChild("Humanoid")
+	char.root = char.character:WaitForChild("HumanoidRootPart")
+	
+	char.collision = char.character:WaitForChild("Collision")
+	char.crouchCollision = char.collision:WaitForChild("CollisionCrouch")
 end
 
-function char.toggleCollision(enable: boolean)
-	char.collisionEnabled = enable
-	if char.collision then char.collision.CanCollide = enable end
-	if char.crouchCollision then char.crouchCollision.CanCollide = enable end
-end
-
-function char.updateCharacter(newCharacter: Model?)
-	local character = newCharacter or player.Character or player.CharacterAdded:Wait()
-
-	char.character = character
-	char.humanoid = (character:FindFirstChildOfClass("Humanoid") or character:WaitForChild("Humanoid")) :: Humanoid
-	char.root = character:WaitForChild("HumanoidRootPart") :: BasePart
-
-	char.collision = character:WaitForChild("Collision") :: BasePart
-	char.crouchCollision = character:WaitForChild("CollisionCrouch") :: BasePart
-
-	if collisionConnection then collisionConnection:Disconnect() end
-	if crouchCollisionConnection then crouchCollisionConnection:Disconnect() end
-
-	applyCollision()
-
-	collisionConnection = char.collision:GetPropertyChangedSignal("CanCollide"):Connect(applyCollision)
-	crouchCollisionConnection = char.crouchCollision:GetPropertyChangedSignal("CanCollide"):Connect(applyCollision)
-
-	table.insert(gifscript.connections, collisionConnection)
-	table.insert(gifscript.connections, crouchCollisionConnection)
-end
-
+table.insert(gifscript.connections, runService.Heartbeat:Connect(function()
+	if char.collisionEnabled or not char.checkCharacter() then return end
+	if char.collision.CanCollide then char.collision.CanCollide = false end
+	if char.crouchCollision.CanCollide then char.crouchCollision.CanCollide = false end
+end))
 table.insert(gifscript.connections, player.CharacterAdded:Connect(char.updateCharacter))
-
-if player.Character then
-	task.spawn(char.updateCharacter, player.Character)
-end
+char.updateCharacter()
 
 return char
