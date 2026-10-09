@@ -5,6 +5,8 @@ gifscript.unloaded = true
 gifscript.onUnload:Fire()
 
 gifscript.pathfinding.toggle(false)
+gifscript.char.collisionEnabled = true
+gifscript.char.frictionEnabled = false
 
 for _,connection in pairs(gifscript.connections) do
 	connection:Disconnect()
