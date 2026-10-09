@@ -14,6 +14,7 @@ local leaveLockerEvent = remotesFolder:WaitForChild("CamLock")
 
 local playerGui = char.player:WaitForChild("PlayerGui")
 local A90 = playerGui:WaitForChild("MainUI"):WaitForChild("Jumpscare"):WaitForChild("Jumpscare_A90")
+warn(A90)
 
 -- ROOM --
 
