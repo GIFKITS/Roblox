@@ -61,7 +61,7 @@ end})
 local actions = {}
 
 actions.door = pathfinding.createAction("door", 1, function()
-	return rooms.getDoor():GetPivot().Position
+	return rooms.isHiding() and rooms.getDoor():GetPivot().Position or nil
 end)
 
 actions.locker = pathfinding.createAction("locker", 2, function()
@@ -72,12 +72,12 @@ end)
 
 table.insert(gifscript.connections, actions.locker.pathCompleted:Connect(function(locker)
 	fireproximityprompt(rooms.getLockerPrompt(locker))
-	repeat task.wait() until not rooms.checkEntities()
+	repeat task.wait() until not rooms.checkEntities() and not rooms.checkA90()
 	rooms.leaveLocker()
 end))
 
 actions.stop = pathfinding.createAction("stop", 3, function()
-	return (rooms.checkA90() and char.checkCharacter() and not char.character:GetAttribute("Hiding")) and Vector3.one * math.huge or nil
+	return (rooms.checkA90() and rooms.isHiding()) and Vector3.one * math.huge or nil
 end)
 
 warn("Loaded")
