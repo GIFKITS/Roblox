@@ -12,7 +12,7 @@ local currentRoomsFolder = workspace:WaitForChild("CurrentRooms")
 local remotesFolder = replicatedStorage:WaitForChild("RemotesFolder")
 local leaveLockerEvent = remotesFolder:WaitForChild("CamLock")
 
-local playerGui = char.player
+local playerGui = char.player:WaitForChild("PlayerGui")
 local A90 = playerGui:WaitForChild("MainUI"):WaitForChild("Jumpscare"):WaitForChild("Jumpscare_A90")
 
 function module.getCurrentRoom()
