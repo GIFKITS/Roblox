@@ -54,10 +54,7 @@ function module.toggle(enable)
 	if enable == module.enabled then return end
 	module.enabled = enable
 	
-	if enable and char.checkCharacter() then char.root.CustomPhysicalProperties = PhysicalProperties.new(100) end
 	if enable then return end
-	if char.checkCharacter() then char.root.CustomPhysicalProperties = PhysicalProperties.new(0.7) end
-	
 	module.resetPath(true)
 	module.currentAction = nil
 	module.targetVector = nil
