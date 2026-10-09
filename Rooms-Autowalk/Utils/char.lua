@@ -1,5 +1,5 @@
 local char = {}
-local gifscript = _G.gifscript
+local gifscript = getgenv().gifscript
 
 local players = game:GetService("Players")
 local player = players.LocalPlayer
