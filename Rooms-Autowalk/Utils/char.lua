@@ -16,7 +16,7 @@ char.crouchCollision = nil :: BasePart?
 char.collisionEnabled = true :: boolean
 
 local oldFriction = nil :: PhysicalProperties
-local friction = PhysicalProperties.new(100)
+local friction = PhysicalProperties.new(100, 0.3, 0.5)
 char.frictionEnabled = false :: boolean
 
 function char.checkCharacter()
