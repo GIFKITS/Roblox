@@ -1,9 +1,10 @@
 local char = {}
-local gifscript = getgenv().gifscript
+local gifscript = _G.gifscript
 
 local players = game:GetService("Players")
 local player = players.LocalPlayer
 
+char.player = player :: Player
 char.character = nil :: Model
 char.humanoid = nil :: Humanoid
 char.root = nil :: BasePart
