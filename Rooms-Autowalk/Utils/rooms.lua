@@ -1,4 +1,3 @@
-warn("loading rooms")
 local module = {}
 local gifscript = getgenv().gifscript
 local char = gifscript.char
@@ -15,7 +14,6 @@ local leaveLockerEvent = remotesFolder:WaitForChild("CamLock")
 
 local playerGui = char.player:WaitForChild("PlayerGui")
 local A90 = playerGui:WaitForChild("MainUI"):WaitForChild("Jumpscare"):WaitForChild("Jumpscare_A90")
-warn(A90)
 
 -- ROOM --
 
