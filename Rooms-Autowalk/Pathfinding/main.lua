@@ -62,6 +62,7 @@ function module.toggle(enable)
 end
 
 table.insert(gifscript.connections, runService.Heartbeat:Connect(function()
+	warn(module.enabled)
 	if not module.enabled or not char.checkCharacter() then return end
 	module.followWaypoint()
 	
