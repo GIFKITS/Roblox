@@ -1,3 +1,5 @@
+if getgenv().gifscript then warn("script is already running") return end
+
 -- SETUP --
 
 getgenv().gifscript = {connections = {}, hooks = {}}
@@ -17,10 +19,6 @@ local move = loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/
 local pathfinding = loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/Roblox/refs/heads/main/Rooms-Autowalk/Pathfinding/main.lua"))()
 gifscript.pathfinding = pathfinding
 
--- SERVICES --
-
-local replicatedStorage = game:GetService("ReplicatedStorage")
-
 -- UI --
 
 local fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
@@ -30,18 +28,21 @@ local window = fluent:CreateWindow({
 	TabWidth = 160,
 	Size = UDim2.fromOffset(580, 460),
 	Acrylic = false,
-	Theme = "Dark",
-	MinimizeKey = Enum.KeyCode.LeftAlt
+	Theme = "Darker",
+	MinimizeKey = Enum.KeyCode.LeftAlt,
 })
 local tabs = {
 	main = window:AddTab({ Title = "Main", Icon = "home" }),
+	other = window:AddTab({ Title = "Other", Icon = "settings" }),
 }
 gifscript.ui = {}
 gifscript.ui.lib = fluent
 gifscript.ui.window = window
 gifscript.ui.tabs = tabs
 
-tabs.main:AddButton({Title = "Unload", Description = "unloads script", Callback = function()
+fluent:ToggleTransparency(false)
+
+tabs.other:AddButton({Title = "Unload", Description = "unloads script", Callback = function()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/Roblox/refs/heads/main/Rooms-Autowalk/unload.lua"))()
 end})
 table.insert(gifscript.connections, fluent.GUI.Destroying:Connect(function()
@@ -61,11 +62,12 @@ end})
 local actions = {}
 
 actions.door = pathfinding.createAction("door", 1, function()
-	return rooms.isHiding() and rooms.getDoor():GetPivot().Position or nil
+	if rooms.isHiding() then return end
+	return rooms.getDoor():GetPivot().Position
 end)
 
 actions.locker = pathfinding.createAction("locker", 2, function()
-	if not rooms.checkEntities() or not char.checkCharacter() then return end
+	if rooms.isHiding() or not rooms.checkEntities() or not char.checkCharacter() then return end
 	local locker = rooms.getClosestLocker()
 	return locker and rooms.getLockerVector(locker), locker or nil
 end)
@@ -77,7 +79,12 @@ table.insert(gifscript.connections, actions.locker.pathCompleted:Connect(functio
 end))
 
 actions.stop = pathfinding.createAction("stop", 3, function()
-	return (rooms.checkA90() and rooms.isHiding()) and Vector3.one * math.huge or nil
+	if rooms.isHiding() or not rooms.checkA90() then return end
+	return Vector3.one * math.huge or nil
 end)
+
+-- OPTIONS --
+
+local options = loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/Roblox/refs/heads/main/Rooms-Autowalk/options.lua"))()
 
 warn("Loaded")
