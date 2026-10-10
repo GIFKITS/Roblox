@@ -27,11 +27,20 @@ local unloadEvent = gifscript.onUnload
 
 tabs.main:AddSection("speed boost")
 
-local speedboostInput = tabs.main:AddSlider("speedboostInput", {Title = "Speed Boost", Default = 0, Min = 0, Max = 30, Rounding = 1, Callback = function(value)
-	if not char.checkCharacter() then return end
-	char.character:SetAttribute("SpeedBoost", value)
+local speedboostInput = tabs.main:AddSlider("speedboostInput", {Title = "Speed Boost", Default = 0, Min = 0, Max = 30, Rounding = 1})
+
+local speedboostToggle = tabs.main:AddToggle("speedboostToggle", {Title = "Speed Boost Enabled", Default = false, Callback = function(value)
+	if value then
+		char.character:SetAttribute("SpeedBoost", speedboostInput.Value)
+	else
+		char.character:SetAttribute("SpeedBoost", 0)
+	end
 end,})
-local speedboostToggle = tabs.main:AddToggle("speedboostToggle", {Title = "Speed Boost Enabled", Default = false})
+
+speedboostInput:OnChanged(function(value)
+	if not speedboostToggle.Value or not char.checkCharacter() then return end
+	char.character:SetAttribute("SpeedBoost", value)
+end)
 
 -- FULLBRIGHT --
 
