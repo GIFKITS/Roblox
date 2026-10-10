@@ -36,7 +36,7 @@ function module.followWaypoint(self)
 	local direction = (waypointVector - char.root.Position) * Vector3.new(1, 0, 1)
 	
 	gifscript.moveVector = direction
-	if direction.Magnitude < 1 then self.waypointIndex += 1 end
+	if direction.Magnitude < 0.5 then self.waypointIndex += 1 end
 end
 
 function module.computePath(self)
