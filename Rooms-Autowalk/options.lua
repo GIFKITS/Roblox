@@ -27,7 +27,7 @@ local unloadEvent = gifscript.onUnload
 
 tabs.main:AddSection("speed boost")
 
-local speedboostInput = tabs.main:AddSlider("speedboostInput", {Title = "Speed Boost", Default = 0, Min = 0, Max = 30, Callback = function(value)
+local speedboostInput = tabs.main:AddSlider("speedboostInput", {Title = "Speed Boost", Default = 0, Min = 0, Max = 30, Rounding = 1, Callback = function(value)
 	if not char.checkCharacter() then return end
 	char.character:SetAttribute("SpeedBoost", value)
 end,})
