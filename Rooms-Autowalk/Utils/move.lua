@@ -10,7 +10,7 @@ for key, value in pairs(getreg()) do
 	table.insert(gifscript.hooks, {value, "GetMoveVector", method})
 
 	value.GetMoveVector = function(self, ...)
-		if gifscript.moveVector then return gifscript.moveVector end
+		if gifscript.moveVector then return Vector3.new(0, 0, -1) end
 		return method(self, ...)
 	end
 
