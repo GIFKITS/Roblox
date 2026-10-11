@@ -324,5 +324,6 @@ end
 
 tool.Equipped:Connect(module.equip)
 tool.Unequipped:Connect(module.unequip)
+tool.Activated:Connect(module.fire)
 
 return module
