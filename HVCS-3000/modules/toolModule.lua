@@ -131,8 +131,9 @@ local function renderRoom(room)
 				or descendant.Name == "LiveBreakerPolePickup"
 				or descendant.Name == "LiveHintBook"
 			) then
-			local marker = script.Star:Clone()
+			local marker = script:WaitForChild("Star"):Clone()
 			marker.CFrame = descendant.PrimaryPart.CFrame
+			marker.Transparency = 0
 			marker.Parent = screenUI.ViewSpecial
 		end
 	end
