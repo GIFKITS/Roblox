@@ -174,18 +174,27 @@ end
 function module.equip(_tool)
 	print("scanner module: tool equipped!")
 	
+	local finalGrip = CFrame.new(-0.975294709, -0.111819446, -0.0686654299, -0.969304383, -0.0641679987, -0.237347692, -0.0564807914, 0.997639894, -0.0390544683, 0.23929289, -0.0244508442, -0.970639169)
+	local dStart = CFrame.new(-0.31321, -0.172862, 0.566225, -0.015477, -0.0348093, -0.999282, -0.250547, 0.96764, -0.0298336, 0.967977, 0.249913, -0.023691)
+	
 	task.spawn(function()
-		local finalGrip = CFrame.new(-0.975294709, -0.111819446, -0.0686654299, -0.969304383, -0.0641679987, -0.237347692, -0.0564807914, 0.997639894, -0.0390544683, 0.23929289, -0.0244508442, -0.970639169)
-		local dStart = CFrame.new(-0.31321, -0.172862, 0.566225, -0.015477, -0.0348093, -0.999282, -0.250547, 0.96764, -0.0298336, 0.967977, 0.249913, -0.023691)
-		
 		local character = tool.Parent
-		local grip = character:WaitForChild("RightHand"):WaitForChild("RightGrip")
+		local hand = character:FindFirstChild("RightHand")
 
-		grip.C1 = dStart:Inverse() * finalGrip
-		local rise = tweenService:Create(grip, TweenInfo.new(0.26, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {C1 = dStart:Lerp(CFrame.identity, 1.09):Inverse() * finalGrip})
+		local joint
+		repeat
+			for _, child in hand:GetChildren() do
+				if child:IsA("JointInstance") and child.Part1 == handle then joint = child end
+			end
+			task.wait()
+		until joint or tool.Parent ~= character
+		if not joint then return end
+
+		joint.C1 = dStart:Inverse() * finalGrip
+		local rise = tweenService:Create(joint, TweenInfo.new(0.26, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {C1 = dStart:Lerp(CFrame.identity, 1.09):Inverse() * finalGrip})
 		rise:Play()
 		rise.Completed:Wait()
-		tweenService:Create(grip, TweenInfo.new(0.14, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {C1 = finalGrip}):Play()
+		tweenService:Create(joint, TweenInfo.new(0.14, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {C1 = finalGrip}):Play()
 	end)
 	
 	for _, animation in pairs(tool:WaitForChild("Animations"):GetChildren()) do
