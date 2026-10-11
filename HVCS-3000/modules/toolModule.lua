@@ -174,6 +174,29 @@ end
 function module.equip(_tool)
 	print("scanner module: tool equipped!")
 
+	task.spawn(function()
+		local finalGrip = CFrame.new(-0.975294709, -0.111819446, -0.0686654299, -0.969304383, -0.0641679987, -0.237347692, -0.0564807914, 0.997639894, -0.0390544683, 0.23929289, -0.0244508442, -0.970639169)
+		local dStart = CFrame.new(-0.31321, -0.172862, 0.566225, -0.015477, -0.0348093, -0.999282, -0.250547, 0.96764, -0.0298336, 0.967977, 0.249913, -0.023691)
+
+		local delta = Instance.new("CFrameValue")
+		delta.Changed:Connect(function(value)
+			for _, joint in pairs(player.Character.RightHand:GetChildren()) do
+				if joint:IsA("JointInstance") and joint.Part1 == handle then
+					joint.C1 = value:Inverse() * finalGrip
+				end
+			end
+		end)
+
+		delta.Value = dStart
+		local rise = tweenService:Create(delta, TweenInfo.new(0.26, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {Value = dStart:Lerp(CFrame.identity, 1.09)})
+		rise:Play()
+		rise.Completed:Wait()
+		local settle = tweenService:Create(delta, TweenInfo.new(0.14, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Value = CFrame.identity})
+		settle:Play()
+		settle.Completed:Wait()
+		delta:Destroy()
+	end)
+
 	for _, animation in pairs(tool:WaitForChild("Animations"):GetChildren()) do
 		loadedAnimations[animation.Name] = player.Character.Humanoid:LoadAnimation(animation)
 	end
