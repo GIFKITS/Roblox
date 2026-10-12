@@ -119,8 +119,6 @@ local function doroom(p8)
 end;
 
 function v7.equip(p14)
-	print("scanner module: tool equipped!");
-
 	for _, child in pairs(script_Parent:WaitForChild("Animations"):GetChildren()) do
 		u6[child.Name] = LocalPlayer.Character.Humanoid:LoadAnimation(child);
 	end;
@@ -226,7 +224,6 @@ function v7.fire()
 end;
 
 function v7.unequip(p19)
-	print("scanner module: tool unequipped!");
 	ScreenUI.Parent = script;
 	ScreenUI.Enabled = false;
 	u1 = false;
