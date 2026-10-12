@@ -1,5 +1,3 @@
-warn("Loading")
-
 local ScreenUI = script:WaitForChild("ScreenUI");
 local LocalPlayer = game.Players.LocalPlayer;
 local script_Parent = script.Parent;
@@ -251,12 +249,8 @@ function v7.unequip(p19)
 	u6.idle:Stop();
 end;
 
-warn("Loaded1")
-
 script_Parent.Equipped:Connect(v7.equip);
 script_Parent.Unequipped:Connect(v7.unequip);
 script_Parent.Activated:Connect(v7.fire)
-
-warn("Loaded2")
 
 return v7;
