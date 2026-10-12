@@ -1,6 +1,8 @@
 -- BY GIFKITS --
 -- visual only
 
+warn("Loading...")
+
 local player = game:GetService("Players").LocalPlayer
 local scanner = game:GetObjects("rbxassetid://108162649962275")[1]
 scanner.Parent = player.Backpack
@@ -20,3 +22,5 @@ handle.Use.SoundId = "rbxassetid://8689839379"
 local moduleSource = loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/Roblox/refs/heads/main/HVCS-3000/legacy/source.lua"))
 setfenv(moduleSource, setmetatable({script = module}, {__index = getfenv()}))
 local toolModuleTable = moduleSource()
+
+warn("Loaded")
