@@ -17,6 +17,6 @@ handle.Disable.SoundId = "rbxassetid://8690667956"
 handle.Idle.SoundId = "rbxassetid://8689839904"
 handle.Use.SoundId = "rbxassetid://8689839379"
 
-local moduleSource = loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/Roblox/refs/heads/main/HVCS-3000/source.lua"))
+local moduleSource = loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/Roblox/refs/heads/main/HVCS-3000/legacy/source.lua"))
 setfenv(moduleSource, setmetatable({script = module}, {__index = getfenv()}))
 local toolModuleTable = moduleSource()
