@@ -20,6 +20,6 @@ gifscript.onUnload.Event:Once(function()
 	
 end)
 
-table.insert(gifscript.connections, runService.Heartbeat:Connect(function()
+table.insert(gifscript.connections, runService.RenderStepped:Connect(function()
 	if fullbrightToggle.Value then lighting.Ambient = fullbrightColor.Value end
 end))
