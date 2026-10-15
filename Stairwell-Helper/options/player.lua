@@ -35,18 +35,6 @@ crouchHook = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
 end))
 
 crouchEvent:FireServer(false)
-task.spawn(function()
-	if not char.checkCharacter() then return end
-	
-	local connection
-	connection = char.character.AttributeChanged:Connect(function(name)
-		if name ~= "Sliding" or not char.checkCharacter() then return end
-		char.character:SetAttribute("Sliding", false)
-		connection:Disconnect()
-	end)
-	table.insert(gifscript.connections, connection)
-end)
-
 table.insert(gifscript.hooks, {"metamethod", game, "__namecall", crouchHook})
 
 local removeAccelerationProps = PhysicalProperties.new(100, 100, 100)
@@ -74,4 +62,5 @@ end)
 
 table.insert(gifscript.connections, runService.Heartbeat:Connect(function()
 	if speedBoostSlider.Value ~= 0 and char.checkCharacter() then char.character:SetAttribute("SpeedBoost", speedBoostSlider.Value) end
+	if char.checkCharacter() and char.character:GetAttribute("Sliding") then char.character:SetAttribute("Sliding", false) end
 end))
