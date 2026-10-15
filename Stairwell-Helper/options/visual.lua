@@ -39,9 +39,11 @@ local function updateLandingMap()
 	if landingMap then landingMap:Destroy() landingMap = nil end
 	
 	local currentLanding = getCurrentLanding()
-	local mapBoard = currentLanding and currentLanding:FindFirstChild("StairwellChunkMapBoard", true) or nil
-	if not mapBoard then return end
+	if not currentLanding then return end
 	
+	local mapBoard = currentLanding.Assets:WaitForChild("StairwellChunkMapBoard")
+	if not mapBoard then return end
+
 	local mapFrame: Frame = mapBoard:FindFirstChild("MapContainer", true)
 	if not mapFrame then return end
 	mapFrame = mapFrame:Clone()
