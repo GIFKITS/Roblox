@@ -63,9 +63,9 @@ end})
 
 -- Connections --
 
-table.insert(gifscript.connections, gifscript.onUnload.Event:Connect(function()
+gifscript.onUnload.Event:Once(function()
 	if char.checkCharacter() then char.character:SetAttribute("SpeedBoost", 0) end
-end))
+end)
 
 table.insert(gifscript.connections, runService.Heartbeat:Connect(function()
 	if speedBoostSlider.Value ~= 0 and char.checkCharacter() then char.character:SetAttribute("SpeedBoost", speedBoostSlider.Value) end
