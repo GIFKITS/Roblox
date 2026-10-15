@@ -12,4 +12,6 @@ for _,hook in pairs(gifscript.hooks) do
 end
 
 gifscript.ui.lib:Destroy()
+getgenv().gifscript = nil
+
 warn("Unloaded")
