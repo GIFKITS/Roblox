@@ -55,8 +55,8 @@ local function updateLandingMap()
 	mapContainer.Rotation = 0
 	
 	for _,element in pairs(mapContainer:GetChildren()) do
-		if element:IsA("ImageLabel") then icon.Rotation = 0 end
-		if element:IsA("Frame") and element.Name == "Wall" then element.Size = UDim2.fromScale(element.Size.X.Scale, 0.005) end
+		if element:IsA("ImageLabel") then element.Rotation = 0 end
+		if element:IsA("Frame") and element.Name == "Wall" then element.Size = UDim2.fromScale(element.Size.X.Scale, 0.0025) end
 	end
 	
 	landingMap = mapContainer
