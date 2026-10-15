@@ -20,6 +20,8 @@ local fullbrightColor = visualTab:AddColorpicker("fullbrightColor", {Title = "Fu
 visualTab:AddSection("Landing")
 
 local landingMap = nil
+local landing = nil
+
 local landingMapGui = Instance.new("ScreenGui", game.CoreGui)
 landingMapGui.Enabled = false
 landingMapGui.DisplayOrder = -100
@@ -44,6 +46,7 @@ local function updateLandingMap()
 	local mapBoard = currentLanding and currentLanding:FindFirstChild("StairwellChunkMapBoard", true) or nil
 	if not mapBoard then return end
 	
+	landing = currentLanding
 	local mapFrame: Frame = mapBoard:FindFirstChild("Map", true)
 	local mapContainer: Frame = mapFrame and mapFrame:WaitForChild("MapContainer", 20) or nil
 	task.wait(1)
@@ -75,7 +78,8 @@ end)
 
 table.insert(gifscript.connections, char.player.AttributeChanged:Connect(function(name)
 	if name ~= "CurrentRoom" then return end
-	updateLandingMap()
+	landingMapGui.Enabled = (getCurrentLanding() and showLandingMapToggle.Value) and true or false
+	if landing ~= getCurrentLanding() then updateLandingMap() end
 end))
 
 table.insert(gifscript.connections, runService.RenderStepped:Connect(function()
