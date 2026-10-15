@@ -1,66 +1,81 @@
 local gifscript = getgenv().gifscript
 local char = gifscript.char
 
+local collectionService = game:GetService("CollectionService")
 local runService = game:GetService("RunService")
+local lighting = game:GetService("Lighting")
 
 local ui = gifscript.ui
 local tabs = ui.tabs
 
-local playerTab = tabs.player
-playerTab:AddParagraph({Title = char.checkCharacter() and char.humanoid.DisplayName or "Unknown", Content = string.format("@%s", char.player.Name)})
+local visualTab = tabs.visual
 
--- Speed Boost --
+-- Fullbright --
 
-playerTab:AddSection("Speed Boost")
+local fullbrightToggle = visualTab:AddToggle("fullbrightToggle", {Title = "Fullbright", Description = "allows you to see in the dark", Default = false})
+local fullbrightColor = visualTab:AddColorpicker("fullbrightColor", {Title = "Fullbright Color", Default = Color3.new(1, 1, 1)})
 
-local crouchHook
-local crouchHookEnabled = false
-local crouchEvent = game:GetService("ReplicatedStorage"):WaitForChild("RemotesFolder"):WaitForChild("Crouch")
+-- Landing --
 
-local speedBoostSlider = playerTab:AddSlider("SpeedBoostSlider", {Title = "Speed Boost", Description = "changes speed boost", Default = 0, Min = 0, Max = 100, Rounding = 0, Callback = function(value)
-	if char.checkCharacter() and value == 0 then char.character:SetAttribute("SpeedBoost", 0) end
-	crouchHookEnabled = value ~= 0
-	crouchEvent:FireServer(false, true)
-end})
+visualTab:AddSection("Landing")
 
-crouchHook = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
-	local method = getnamecallmethod()
-	local args = table.pack(...)
+local landingMap = nil
+local landingMapGui = Instance.new("ScreenGui", game.CoreGui)
+landingMapGui.Enabled = false
+landingMapGui.DisplayOrder = -100
+
+local landingMapHandler = Instance.new("CanvasGroup", landingMapGui)
+landingMapHandler.BackgroundTransparency = 1
+landingMapHandler.BorderSizePixel = 0
+landingMapHandler.Size = UDim2.fromScale(1, 1)
+
+local function getCurrentLanding()
+	local playerLanding = char.player:GetAttribute("CurrentRoom")
+	for _,landing in pairs(collectionService:GetTagged("LandingPalette")) do
+		if landing.Name == tostring(playerLanding) then return landing end
+	end
+end
+
+local function updateLandingMap()
+	if landingMap then landingMap:Destroy() landingMap = nil end
 	
-	if crouchHookEnabled and self == crouchEvent and method == "FireServer" then
-		args[2] = true
+	local currentLanding = getCurrentLanding()
+	local mapBoard = currentLanding and currentLanding:FindFirstChild("StairwellChunkMapBoard", true) or nil
+	if not mapBoard then return end
+	
+	local mapFrame: Frame = mapBoard:FindFirstChild("Map", true)
+	local mapContainer: Frame = mapFrame and mapFrame:WaitForChild("MapContainer", 20) or nil
+	task.wait(1)
+	
+	if not mapContainer then return end
+	mapContainer = mapContainer:Clone()
+	
+	mapContainer.Parent = landingMapHandler
+	mapContainer.Rotation = 0
+	
+	for _,icon in pairs(mapContainer:GetChildren()) do
+		if icon:IsA("ImageLabel") then icon.Rotation = 0 end
 	end
 	
-	return crouchHook(self, table.unpack(args))
-end))
+	landingMap = mapContainer
+end
 
-crouchEvent:FireServer(false)
-table.insert(gifscript.hooks, {"metamethod", game, "__namecall", crouchHook})
-
-local removeAccelerationProps = PhysicalProperties.new(100, 100, 100)
-local storedPhysicalProps = nil
-
-local removeAccelerationToggle = playerTab:AddToggle("removeAccelerationToggle", {Title = "Remove Acceleration", Description = "removes root acceleration", Default = false, Callback = function(value)
-	if value and char.checkCharacter() then
-		storedPhysicalProps = char.root.CurrentPhysicalProperties
-		char.root.CustomPhysicalProperties = removeAccelerationProps
-	elseif not value and storedPhysicalProps and char.checkCharacter() then
-		char.root.CustomPhysicalProperties = storedPhysicalProps
-	end
+local showLandingMapToggle = visualTab:AddToggle("showLandingMapToggle", {Title = "Show Landing Map", Description = "displays a landing map in the center of your screen", Default = false, Callback = function(value)
+	if not landingMap then updateLandingMap() end
+	landingMapGui.Enabled = value
 end})
 
--- Connections --
+-- Connections--
 
 gifscript.onUnload.Event:Once(function()
-	if char.checkCharacter() then
-		char.character:SetAttribute("SpeedBoost", 0)
-	end
-	if storedPhysicalProps and char.checkCharacter() then
-		char.root.CustomPhysicalProperties = storedPhysicalProps
-	end
+	landingMapGui:Destroy()
 end)
 
-table.insert(gifscript.connections, runService.Heartbeat:Connect(function()
-	if speedBoostSlider.Value ~= 0 and char.checkCharacter() then char.character:SetAttribute("SpeedBoost", speedBoostSlider.Value) end
-	if char.checkCharacter() and char.character:GetAttribute("Sliding") then char.character:SetAttribute("Sliding", false) end
+table.insert(gifscript.connections, char.player.AttributeChanged:Connect(function(name)
+	if name ~= "CurrentRoom" then return end
+	updateLandingMap()
+end))
+
+table.insert(gifscript.connections, runService.RenderStepped:Connect(function()
+	if fullbrightToggle.Value then lighting.Ambient = fullbrightColor.Value end
 end))
