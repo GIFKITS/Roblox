@@ -8,7 +8,11 @@ for _,connection in pairs(gifscript.connections) do
 end
 
 for _,hook in pairs(gifscript.hooks) do
-	hook[1][2] = hook[3]
+	if hook[1] == "metamethod" then
+		hookmetamethod(hook[2], hook[3], hook[4])
+	elseif hook[1] == "reg" then
+		hook[2][3] = hook[4]
+	end
 end
 
 gifscript.ui.lib:Destroy()
