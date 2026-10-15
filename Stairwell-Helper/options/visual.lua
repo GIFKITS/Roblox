@@ -22,6 +22,7 @@ visualTab:AddSection("Landing")
 local landingMap = nil
 local landingMapGui = Instance.new("ScreenGui", game.CoreGui)
 landingMapGui.Enabled = false
+landingMapGui.DisplayOrder = -100
 
 local landingMapHandler = Instance.new("CanvasGroup", landingMapGui)
 landingMapHandler.BackgroundTransparency = 1
@@ -39,23 +40,23 @@ local function updateLandingMap()
 	if landingMap then landingMap:Destroy() landingMap = nil end
 	
 	local currentLanding = getCurrentLanding()
-	if not currentLanding then return end
-	
-	local mapBoard = currentLanding.Assets:WaitForChild("StairwellChunkMapBoard")
+	local mapBoard = currentLanding and currentLanding:FindFirstChild("StairwellChunkMapBoard", true) or nil
 	if not mapBoard then return end
-
-	local mapFrame: Frame = mapBoard:FindFirstChild("MapContainer", true)
-	if not mapFrame then return end
-	mapFrame = mapFrame:Clone()
 	
-	mapFrame.Parent = landingMapHandler
-	mapFrame.Rotation = 0
+	local mapFrame: Frame = mapBoard:FindFirstChild("Map", true)
+	local mapContainer: Frame = mapFrame and mapFrame:WaitForChild("MapContainer", 20) or nil
 	
-	for _,icon in pairs(mapFrame:GetChildren()) do
+	if not mapContainer then return end
+	mapContainer = mapContainer:Clone()
+	
+	mapContainer.Parent = landingMapHandler
+	mapContainer.Rotation = 0
+	
+	for _,icon in pairs(mapContainer:GetChildren()) do
 		if icon:IsA("ImageLabel") then icon.Rotation = 0 end
 	end
 	
-	landingMap = mapFrame
+	landingMap = mapContainer
 end
 
 local showLandingMapToggle = visualTab:AddToggle("showLandingMapToggle", {Title = "Show Landing Map", Description = "displays a landing map in the center of your screen", Default = false, Callback = function(value)
