@@ -64,7 +64,12 @@ end})
 -- Connections --
 
 gifscript.onUnload.Event:Once(function()
-	if char.checkCharacter() then char.character:SetAttribute("SpeedBoost", 0) end
+	if char.checkCharacter() then
+		char.character:SetAttribute("SpeedBoost", 0)
+	end
+	if storedPhysicalProps and char.checkCharacter() then
+		char.root.CustomPhysicalProperties = storedPhysicalProps
+	end
 end)
 
 table.insert(gifscript.connections, runService.Heartbeat:Connect(function()
