@@ -5,18 +5,19 @@ local runService = game:GetService("RunService")
 
 local ui = gifscript.ui
 local tabs = ui.tabs
-local playerTab = tabs.player
 
+local playerTab = tabs.player
 playerTab:AddParagraph({Title = char.checkCharacter() and char.humanoid.DisplayName or "Unknown", Content = string.format("@%s", char.player.Name)})
-local humanoidSection = playerTab:AddSection("Humanoid")
 
 -- Speed Boost --
+
+local speedBoostSection = playerTab:AddSection("Speed Boost")
 
 local crouchHook
 local crouchHookEnabled = false
 local crouchEvent = game:GetService("ReplicatedStorage"):WaitForChild("RemotesFolder"):WaitForChild("Crouch")
 
-local speedBoostSlider = playerTab:AddSlider("MySlider", {Title = "SpeedBoost", Description = "Change speedboost", Default = 0, Min = 0, Max = 100, Rounding = 0, Callback = function(value)
+local speedBoostSlider = playerTab:AddSlider("SpeedBoostSlider", {Title = "Speed Boost", Description = "changes speed boost", Default = 0, Min = 0, Max = 100, Rounding = 0, Callback = function(value)
 	if char.checkCharacter() and value == 0 then char.character:SetAttribute("SpeedBoost", 0) end
 	crouchHookEnabled = value ~= 0
 	crouchEvent:FireServer(false, true)
@@ -47,6 +48,20 @@ task.spawn(function()
 end)
 
 table.insert(gifscript.hooks, {"metamethod", game, "__namecall", crouchHook})
+
+local removeAccelerationProps = PhysicalProperties.new(100, 100, 100)
+local storedPhysicalProps = nil
+
+local removeAccelerationToggle = playerTab:AddToggle("removeAccelerationToggle", {Title = "Remove Acceleration", Description = "removes root acceleration", Default = false, Callback = function(value)
+	if value and char.checkCharacter() then
+		storedPhysicalProps = char.root.CurrentPhysicalProperties
+		char.root.CustomPhysicalProperties = removeAccelerationProps
+	elseif not value and storedPhysicalProps and char.checkCharacter() then
+		char.root.CustomPhysicalProperties = storedPhysicalProps
+	end
+end})
+
+-- Connections --
 
 table.insert(gifscript.connections, gifscript.onUnload.Event:Connect(function()
 	if char.checkCharacter() then char.character:SetAttribute("SpeedBoost", 0) end
