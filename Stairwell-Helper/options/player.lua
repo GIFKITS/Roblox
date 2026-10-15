@@ -11,7 +11,7 @@ playerTab:AddParagraph({Title = char.checkCharacter() and char.humanoid.DisplayN
 
 -- Speed Boost --
 
-local speedBoostSection = playerTab:AddSection("Speed Boost")
+playerTab:AddSection("Speed Boost")
 
 local crouchHook
 local crouchHookEnabled = false
