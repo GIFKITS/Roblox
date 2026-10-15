@@ -65,7 +65,7 @@ gifscript.onUnload.Event:Once(function()
 	landingMapGui:Destroy()
 end)
 
-table.insert(gifscript.connections, char.player.AttributeChanged(function(name)
+table.insert(gifscript.connections, char.player.AttributeChanged:Connect(function(name)
 	if name ~= "CurrentRoom" or not getCurrentLanding() then return end
 	updateLandingMap()
 end))
