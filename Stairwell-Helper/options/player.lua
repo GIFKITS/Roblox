@@ -23,6 +23,7 @@ local landingMap = nil
 local landingMapGui = Instance.new("ScreenGui", game.CoreGui)
 landingMapGui.Enabled = false
 landingMapGui.DisplayOrder = -100
+landingMapGui.IgnoreGuiInset = true
 
 local landingMapHandler = Instance.new("CanvasGroup", landingMapGui)
 landingMapHandler.BackgroundTransparency = 1
@@ -53,8 +54,9 @@ local function updateLandingMap()
 	mapContainer.Parent = landingMapHandler
 	mapContainer.Rotation = 0
 	
-	for _,icon in pairs(mapContainer:GetChildren()) do
-		if icon:IsA("ImageLabel") then icon.Rotation = 0 end
+	for _,element in pairs(mapContainer:GetChildren()) do
+		if element:IsA("ImageLabel") then icon.Rotation = 0 end
+		if element:IsA("Frame") and element.Name == "Wall" then element.Size = UDim2.fromScale(element.Size.X.Scale, 0.005) end
 	end
 	
 	landingMap = mapContainer
