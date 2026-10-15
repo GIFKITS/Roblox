@@ -28,13 +28,14 @@ landingMapHandler.BorderSizePixel = 0
 landingMapHandler.Size = UDim2.fromScale(1, 1)
 
 local function getCurrentLanding()
-	local landings = collectionService:GetTagged("LandingPalette")
 	local playerLanding = char.player:GetAttribute("CurrentRoom")
-	return table.find(landings, tostring(playerLanding))
+	for _,landing in pairs(collectionService:GetTagged("LandingPalette")) do
+		if landing.Name == tostring(playerLanding) then return landing end
+	end
 end
 
 local function updateLandingMap()
-	if landingMap then landingMap:Destroy() end
+	if landingMap then landingMap:Destroy() landingMap = nil end
 	
 	local currentLanding = getCurrentLanding()
 	local mapBoard = currentLanding and currentLanding:FindFirstChild("StairwellChunkMapBoard", true) or nil
@@ -66,7 +67,7 @@ gifscript.onUnload.Event:Once(function()
 end)
 
 table.insert(gifscript.connections, char.player.AttributeChanged:Connect(function(name)
-	if name ~= "CurrentRoom" or not getCurrentLanding() then return end
+	if name ~= "CurrentRoom" then return end
 	updateLandingMap()
 end))
 
