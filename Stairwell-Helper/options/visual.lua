@@ -21,6 +21,7 @@ visualTab:AddSection("Landing")
 
 local landingMap = nil
 local landingMapGui = Instance.new("ScreenGui", game.CoreGui)
+landingMapGui.Enabled = false
 
 local landingMapHandler = Instance.new("CanvasGroup", landingMapGui)
 landingMapHandler.BackgroundTransparency = 1
