@@ -43,7 +43,7 @@ end
 local function updatePlayerMarker()
 	if not playerMarker or not exitSign or not char.checkCharacter() then return end
 	
-	local playerPos: Vector3 = char.root.Potition - exitSign.Position
+	local playerPos: Vector3 = char.root.Position - exitSign.Position
 	local markerPos = UDim2.fromOffset(playerPos.X, playerPos.Z)
 	
 	playerMarker.Position = markerPos
