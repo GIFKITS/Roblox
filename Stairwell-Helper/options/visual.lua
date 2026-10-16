@@ -67,7 +67,7 @@ local function visualizePath(targetVector: Vector3)
 		local beam = Instance.new("Beam")
 		beam.LightInfluence = 0
 		beam.Brightness = 5
-		beam.Color = Color3.fromRGB(0, 255, 0)
+		beam.Color = ColorSequence.new(Color3.fromRGB(0, 255, 0))
 		beam.Transparency = 0
 		
 		beam.Attachment0 = pathDebris[index-1]
