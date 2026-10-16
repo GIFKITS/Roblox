@@ -20,6 +20,8 @@ local fullbrightColor = visualTab:AddColorpicker("fullbrightColor", {Title = "Fu
 visualTab:AddSection("Landing")
 
 local landingMap = nil
+local playerMarker = nil
+local exitSign = nil
 
 local landingMapGui = Instance.new("ScreenGui", game.CoreGui)
 landingMapGui.Enabled = false
@@ -38,6 +40,15 @@ local function getCurrentLanding()
 	end
 end
 
+local function updatePlayerMarker()
+	if not playerMarker or not exitSign or not char.checkCharacter() then return end
+	
+	local playerPos: Vector3 = char.root.Potition - exitSign.Position
+	local markerPos = UDim2.fromOffset(playerPos.X, playerPos.Z)
+	
+	playerMarker.Position = markerPos
+end
+
 local function updateLandingMap()
 	if landingMap then landingMap:Destroy() landingMap = nil end
 	
@@ -46,6 +57,7 @@ local function updateLandingMap()
 	
 	local mapContainer: Model
 	repeat task.wait() mapContainer = currentLanding:FindFirstChild("MapContainer", true) until mapContainer
+	task.wait(.5)
 	
 	mapContainer = mapContainer:Clone()
 	
@@ -54,9 +66,11 @@ local function updateLandingMap()
 	
 	for _,element in pairs(mapContainer:GetChildren()) do
 		if element:IsA("ImageLabel") then element.Rotation = 0 end
-		if element:IsA("Frame") and element.Name == "Wall" then element.Size = UDim2.fromScale(element.Size.X.Scale, 0.0025) end
+		if element:IsA("Frame") and element.Name == "Wall" then element.Size = UDim2.fromScale(element.Size.X.Scale, 0.0045) end
 	end
-	
+		
+	exitSign = currentLanding:FindFirstChild("ExitSign")
+	playerMarker = mapContainer:FindFirstChild("Marker_YouAreHere")
 	landingMap = mapContainer
 end
 
@@ -79,4 +93,5 @@ end))
 
 table.insert(gifscript.connections, runService.RenderStepped:Connect(function()
 	if fullbrightToggle.Value then lighting.Ambient = fullbrightColor.Value end
+	if landingMapGui.Enabled then updatePlayerMarker() end
 end))
