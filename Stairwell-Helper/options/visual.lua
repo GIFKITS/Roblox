@@ -79,7 +79,7 @@ end
 
 local fireAlarmPathFindToggle = visualTab:AddToggle("fireAlarmPathFindToggle", {Title = "Compute Path To Fire Alarm", Description = "leads the way to the fire alarm", Default = false, Callback = function(value)
 	if value then
-		visualizePath(getFireAlarmVector())
+		visualizePath(Vector3.new(326.878876, 69.5956726, -138.733398))
 	else
 		removePathDebris()
 	end
