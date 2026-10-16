@@ -53,7 +53,7 @@ local function createPathfindingModifiers()
 	local landing = getCurrentLanding()
 	if not landing then return end
 
-	for _,object in pairs(landing:GetChildren()) do
+	for _,object in pairs(landing:GetDescendants()) do
 		if object.Name ~= "VentCover" then continue end
 		local modifier = Instance.new("PathfindingModifier")
 		modifier.Parent = object
