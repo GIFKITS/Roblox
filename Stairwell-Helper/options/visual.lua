@@ -1,10 +1,10 @@
 local gifscript = getgenv().gifscript
 local char = gifscript.char
 
-local collectionService = game:GetService("CollectionService")
 local runService = game:GetService("RunService")
 local lighting = game:GetService("Lighting")
 local pathfinding = game:GetService("PathfindingService")
+local terrain = workspace:WaitForChild("Terrain")
 
 local ui = gifscript.ui
 local lib = ui.lib
@@ -17,14 +17,14 @@ local visualTab = tabs.visual
 local fullbrightToggle = visualTab:AddToggle("fullbrightToggle", {Title = "Fullbright", Description = "allows you to see in the dark", Default = false})
 local fullbrightColor = visualTab:AddColorpicker("fullbrightColor", {Title = "Fullbright Color", Default = Color3.new(1, 1, 1)})
 
--- Landing --
+-- Pathfinding --
 
 visualTab:AddSection("Pathfinding")
 
 local currentRooms = workspace:WaitForChild("CurrentRooms")
 
 local path = nil
-local agentParams = {AgentRadius = 1, AgentHeight = 5, WaypointSpacing = 1, AgentCanJump = false}
+local agentParams = {AgentRadius = 1, AgentHeight = 1, WaypointSpacing = 1, AgentCanJump = false}
 local pathDebris = {}
 
 local function getCurrentLanding()
@@ -49,10 +49,24 @@ local function removePathDebris()
 	path = nil
 end
 
+local function createPathfindingModifiers()
+	local landing = getCurrentLanding()
+	if not landing then return end
+
+	for _,object in pairs(landing:GetChildren()) do
+		if object.Name ~= "VentCover" then continue end
+		local modifier = Instance.new("PathfindingModifier")
+		modifier.Parent = object
+		modifier.PassThrough = true
+		table.insert(pathDebris, modifier)
+	end
+end
+
 local function visualizePath(targetVector: Vector3)
 	if not targetVector or not char.checkCharacter() then return end
 	
 	removePathDebris()
+	createPathfindingModifiers()
 	path = pathfinding:CreatePath(agentParams)
 	
 	local success, err = pcall(function()
@@ -64,7 +78,7 @@ local function visualizePath(targetVector: Vector3)
 	
 	for index, waypoint in pairs(waypoints) do
 		local attach = Instance.new("Attachment")
-		attach.Parent = workspace
+		attach.Parent = terrain
 		attach.Name = "PathAttachment"
 		attach.WorldPosition = waypoint.Position
 		attach.Visible = true
