@@ -27,6 +27,21 @@ local path = nil
 local agentParams = {AgentRadius = 1, AgentHeight = 5, WaypointSpacing = 1, AgentCanJump = false}
 local pathDebris = {}
 
+local function getCurrentLanding()
+	return currentRooms:FindFirstChild(tostring(char.player:GetAttribute("CurrentRoom")))
+end
+
+local function getExitVector()
+	local landing = getCurrentLanding()
+	if not landing then return end
+
+	local exitSign = landing:FindFirstChild("ExitSignStairwell", true)
+	if not exitSign then return end
+
+	local pivot: CFrame = exitSign:GetPivot()
+	return pivot.Position - Vector3.new(0, 7, 0)
+end
+
 local function removePathDebris()
 	for _,debris in pairs(pathDebris) do
 		debris:Destroy()
@@ -41,7 +56,7 @@ local function visualizePath(targetVector: Vector3)
 	path = pathfinding:CreatePath(agentParams)
 	
 	local success, err = pcall(function()
-		path:ComputeAsync(char.root.Position, targetVector)
+		path:ComputeAsync(getExitVector(), targetVector)
 	end)
 	
 	if not success or path.Status == Enum.PathStatus.NoPath then lib:Notify({Title = "Error", Content = tostring(err), Duration = 5}) return end
@@ -57,11 +72,13 @@ local function visualizePath(targetVector: Vector3)
 	end
 end
 
+local function getFireAlarm()
+	local landing = getCurrentLanding()
+	return landing and landing:FindFirstChild("StairwellFireAlarm", true) or nil
+end
+
 local function getFireAlarmVector()
-	local landing = currentRooms:FindFirstChild(tostring(char.player:GetAttribute("CurrentRoom")))
-	if not landing then return end
-	
-	local fireAlarm = landing:FindFirstChild("StairwellFireAlarm", true)
+	local fireAlarm = getFireAlarm()
 	if not fireAlarm then return end
 	
 	local pivot: CFrame = fireAlarm:GetPivot()
@@ -76,11 +93,21 @@ local fireAlarmPathFindToggle = visualTab:AddToggle("fireAlarmPathFindToggle", {
 	end
 end})
 
+-- ESP --
+
+visualTab:AddSection("ESP")
+
+
 -- Connections--
 
 gifscript.onUnload.Event:Once(function()
 	removePathDebris()
 end)
+
+table.insert(gifscript.connections, char.player.AttributeChanged:Connect(function(name)
+	if name ~= "CurrentRoom" then return end
+	visualizePath(getFireAlarmVector())
+end))
 
 table.insert(gifscript.connections, runService.RenderStepped:Connect(function()
 	if fullbrightToggle.Value then lighting.Ambient = fullbrightColor.Value end
