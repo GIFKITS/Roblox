@@ -20,7 +20,6 @@ local fullbrightColor = visualTab:AddColorpicker("fullbrightColor", {Title = "Fu
 visualTab:AddSection("Landing")
 
 local landingMap = nil
-local landing = nil
 
 local landingMapGui = Instance.new("ScreenGui", game.CoreGui)
 landingMapGui.Enabled = false
@@ -43,15 +42,11 @@ local function updateLandingMap()
 	if landingMap then landingMap:Destroy() landingMap = nil end
 	
 	local currentLanding = getCurrentLanding()
-	local mapBoard = currentLanding and currentLanding:FindFirstChild("StairwellChunkMapBoard", true) or nil
-	if not mapBoard then return end
+	if not currentLanding then return end
 	
-	landing = currentLanding
-	local mapFrame: Frame = mapBoard:FindFirstChild("Map", true)
-	local mapContainer: Frame = mapFrame and mapFrame:WaitForChild("MapContainer", 20) or nil
-	task.wait(1)
+	local mapContainer = currentLanding:FindFirstChild("MapContainer")
+	repeat task.wait() mapContainer = currentLanding:FindFirstChild("MapContainer") until mapContainer
 	
-	if not mapContainer then return end
 	mapContainer = mapContainer:Clone()
 	
 	mapContainer.Parent = landingMapHandler
