@@ -133,8 +133,8 @@ local function addEsp(object: Instance, name, color: Color3)
 	esp:AddTag("esp")
 end
 
-local espFireAlarmToggle = visualTab:AddToggle("espFireAlarmToggle", {Title = "ESP Fire Alarm", Description = "allows you to see through walls", Default = false, Callback = function()
-	removeEsp("fireAlarm")
+local espFireAlarmToggle = visualTab:AddToggle("espFireAlarmToggle", {Title = "ESP Fire Alarm", Description = "allows you to see through walls", Default = false, Callback = function(value)
+	if not value then removeEsp("fireAlarm") end
 end})
 
 -- Connections--
