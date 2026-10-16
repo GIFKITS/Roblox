@@ -68,7 +68,7 @@ local function visualizePath(targetVector: Vector3)
 end
 
 local function getFireAlarmVector()
-	local landing = currentRooms:FindFirstChild(tostring(char.Player:GetAttribute("CurrentRoom")))
+	local landing = currentRooms:FindFirstChild(tostring(char.player:GetAttribute("CurrentRoom")))
 	if not landing then return end
 	
 	local fireAlarm = landing:FindFirstChild("StairwellFireAlarm", true)
