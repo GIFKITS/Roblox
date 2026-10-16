@@ -113,9 +113,9 @@ end})
 visualTab:AddSection("ESP")
 
 local function removeEsp(name)
-	local espTable = collectionService:GetTagged("esp_"..tostring(name))
+	local espTable = collectionService:GetTagged(name and "esp_"..tostring(name) or "esp")
 	for _,esp in pairs(espTable) do
-		if esp:IsA("Highlight") then esp:Destroy() else esp:RemoveTag("esp_"..tostring(name)) end
+		if esp:IsA("Highlight") then esp:Destroy() else esp:RemoveTag("esp_"..tostring(name)) esp:RemoveTag("esp") end
 	end
 end
 
@@ -128,15 +128,20 @@ local function addEsp(object: Instance, name, color: Color3)
 	esp.FillColor = color or Color3.new(0, 1, 0)
 	esp.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
 	object:AddTag("esp_"..tostring(name))
+	object:AddTag("esp")
 	esp:AddTag("esp_"..tostring(name))
+	esp:AddTag("esp")
 end
 
-local espFireAlarmToggle = visualTab:AddToggle("espFireAlarmToggle", {Title = "ESP Fire Alarm", Description = "allows you to see through walls", Default = false})
+local espFireAlarmToggle = visualTab:AddToggle("espFireAlarmToggle", {Title = "ESP Fire Alarm", Description = "allows you to see through walls", Default = false, Callback = function()
+	removeEsp("fireAlarm")
+end})
 
 -- Connections--
 
 gifscript.onUnload.Event:Once(function()
 	removePathDebris()
+	removeEsp()
 end)
 
 table.insert(gifscript.connections, char.player.AttributeChanged:Connect(function(name)
