@@ -44,15 +44,7 @@ local function visualizePath(targetVector: Vector3)
 		path:ComputeAsync(char.root.Position, targetVector)
 	end)
 	
-	if not success then
-		warn(err, success)
-	end
-	if err then
-		warn(err, success)
-	end
-	warn(path.Status.Name)
-	
-	if not success or path.Status == Enum.PathStatus.NoPath then lib:Notify({Title = "Error", Content = "path computing error", Duration = 5}) return end
+	if not success or path.Status == Enum.PathStatus.NoPath then lib:Notify({Title = "Error", Content = tostring(err), Duration = 5}) return end
 	local waypoints = path:GetWaypoints()
 	
 	for index, waypoint in pairs(waypoints) do
@@ -72,12 +64,13 @@ local function getFireAlarmVector()
 	local fireAlarm = landing:FindFirstChild("StairwellFireAlarm", true)
 	if not fireAlarm then return end
 	
-	return fireAlarm:GetPivot().Position
+	local pivot: CFrame = fireAlarm:GetPivot()
+	return pivot.Position - Vector3.new(0, 1.5, 0) + pivot.LookVector * 2.5
 end
 
 local fireAlarmPathFindToggle = visualTab:AddToggle("fireAlarmPathFindToggle", {Title = "Compute Path To Fire Alarm", Description = "leads the way to the fire alarm", Default = false, Callback = function(value)
 	if value then
-		visualizePath(Vector3.new(326.878876, 69, -138.733398))
+		visualizePath(getFireAlarmVector())
 	else
 		removePathDebris()
 	end
