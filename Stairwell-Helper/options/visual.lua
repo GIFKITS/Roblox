@@ -4,8 +4,10 @@ local char = gifscript.char
 local collectionService = game:GetService("CollectionService")
 local runService = game:GetService("RunService")
 local lighting = game:GetService("Lighting")
+local pathfinding = game:GetService("PathfindingService")
 
 local ui = gifscript.ui
+local lib = ui.lib
 local tabs = ui.tabs
 
 local visualTab = tabs.visual
@@ -17,95 +19,78 @@ local fullbrightColor = visualTab:AddColorpicker("fullbrightColor", {Title = "Fu
 
 -- Landing --
 
-visualTab:AddSection("Landing")
+visualTab:AddSection("Pathfinding")
 
-local landingMap = nil
+local currentRooms = workspace:WaitForChild("CurrentRooms")
 
-local playerMarker = nil
-local exitMarker = nil
-local exitSign = nil
-local mapWorldCFrame = nil
-local pixelsX = nil
-local pixelsZ = nil
+local path = nil
+local agentParams = {AgentRadius = 1, AgentHeight = 5, WaypointSpacing = 1, AgentCanJump = false}
+local pathDebris = {}
 
-local landingMapGui = Instance.new("ScreenGui", game.CoreGui)
-landingMapGui.Enabled = false
-landingMapGui.DisplayOrder = -100
-landingMapGui.IgnoreGuiInset = true
+local function removePathDebris()
+	for _,debris in pairs(pathDebris) do
+		debris:Destroy()
+	end
+	path = nil
+end
 
-local landingMapHandler = Instance.new("CanvasGroup", landingMapGui)
-landingMapHandler.BackgroundTransparency = 1
-landingMapHandler.BorderSizePixel = 0
-landingMapHandler.Size = UDim2.fromScale(1, 1)
-
-local function getCurrentLanding()
-	local playerLanding = char.player:GetAttribute("CurrentRoom")
-	for _,landing in pairs(collectionService:GetTagged("LandingPalette")) do
-		if landing.Name == tostring(playerLanding) then return landing end
+local function visualizePath(targetVector: Vector3)
+	if not targetVector or not char.checkCharacter() then return end
+	
+	removePathDebris()
+	path = pathfinding:CreatePath(agentParams)
+	
+	local success, err = pcall(function()
+		path:ComputeAsync(char.root.Position, targetVector)
+	end)
+	if not success or path.Status == Enum.PathStatus.NoPath then lib:Notify({Title = "Error", Content = "path computing error", Duration = 5}) return end
+	local waypoints = path:GetWaypoints()
+	
+	for index, waypoint in pairs(waypoints) do
+		local attach = Instance.new("Attachment")
+		attach.Parent = workspace
+		attach.Name = "PathAttachment"
+		attach.WorldPosition = waypoint.Position
+		table.insert(pathDebris, attach)
+		
+		if not pathDebris[index-1] then continue end
+		
+		local beam = Instance.new("Beam")
+		beam.LightInfluence = 0
+		beam.Brightness = 5
+		beam.Color = Color3.fromRGB(0, 255, 0)
+		beam.Transparency = 0
+		
+		beam.Attachment0 = pathDebris[index-1]
+		beam.Attachment1 = attach
+		beam.Parent = attach
 	end
 end
 
-local function updatePlayerMarker()
-	if not playerMarker or not exitSign or not mapWorldCFrame or not char.checkCharacter() then return end
+local function getFireAlarmVector()
+	local landing = currentRooms:FindFirstChild(tostring(char.Player:GetAttribute("CurrentRoom")))
+	if not landing then return end
 	
-	local delta: Vector3 = mapWorldCFrame:VectorToObjectSpace(char.root.Position - exitSign.Position)
-	playerMarker.Position = exitMarker.Position + UDim2.fromOffset(delta.X * pixelsX, delta.Z * pixelsZ)
+	local fireAlarm = landing:FindFirstChild("StairwellFireAlarm", true)
+	if not fireAlarm then return end
+	
+	return fireAlarm:GetPivot().Position
 end
 
-local function updateLandingMap()
-	if landingMap then landingMap:Destroy() landingMap = nil end
-	
-	local currentLanding = getCurrentLanding()
-	if not currentLanding then return end
-	
-	local mapContainer: Model
-	repeat task.wait() mapContainer = currentLanding:FindFirstChild("MapContainer", true) until mapContainer
-	task.wait(.5)
-	
-	mapContainer = mapContainer:Clone()
-	
-	mapContainer.Parent = landingMapHandler
-	mapContainer.Rotation = 0
-	
-	for _,element: Instance in pairs(mapContainer:GetChildren()) do
-		if element:IsA("ImageLabel") then element.Rotation = 0 end
-		if element:IsA("Frame") and element.Name == "Wall" then element.Size = UDim2.fromScale(element.Size.X.Scale, 0.0045) end
+local fireAlarmPathFindToggle = visualTab:AddToggle("fireAlarmPathFindToggle", {Title = "Compute Path To Fire Alarm", Description = "leads the way to the fire alarm", Default = false, Callback = function(value)
+	if value then
+		visualizePath(getFireAlarmVector())
+	else
+		removePathDebris()
 	end
-	
-	landingMap = mapContainer
-	
-	exitSign = currentLanding:FindFirstChild("ExitSign", true)
-	exitMarker = mapContainer:FindFirstChild("Marker_Exit")
-	playerMarker = mapContainer:FindFirstChild("Marker_YouAreHere")
-	playerMarker.AnchorPoint = Vector2.new(0.5, 1)
-	
-	local worldCFrame, worldSize = currentLanding:GetBoundingBox()
-	local mapSize = mapContainer.AbsoluteSize
-
-	mapWorldCFrame = worldCFrame
-	
-	pixelsX = mapSize.X / worldSize.X
-	pixelsZ = mapSize.Y / worldSize.Z
-end
-
-local showLandingMapToggle = visualTab:AddToggle("showLandingMapToggle", {Title = "Show Landing Map", Description = "displays a landing map in the center of your screen", Default = false, Callback = function(value)
-	if not landingMap then updateLandingMap() end
-	landingMapGui.Enabled = value
 end})
 
 -- Connections--
 
 gifscript.onUnload.Event:Once(function()
-	landingMapGui:Destroy()
+	removePathDebris()
 end)
-
-table.insert(gifscript.connections, char.player.AttributeChanged:Connect(function(name)
-	if name ~= "CurrentRoom" then return end
-	landingMapGui.Enabled = (showLandingMapToggle.Value and getCurrentLanding()) and true or false
-	updateLandingMap()
-end))
 
 table.insert(gifscript.connections, runService.RenderStepped:Connect(function()
 	if fullbrightToggle.Value then lighting.Ambient = fullbrightColor.Value end
-	if landingMapGui.Enabled then updatePlayerMarker() end
 end))
