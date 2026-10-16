@@ -44,8 +44,8 @@ local function updateLandingMap()
 	local currentLanding = getCurrentLanding()
 	if not currentLanding then return end
 	
-	local mapContainer = currentLanding:FindFirstChild("MapContainer")
-	repeat task.wait() mapContainer = currentLanding:FindFirstChild("MapContainer") until mapContainer
+	local mapContainer: Model
+	repeat task.wait() mapContainer = currentLanding:FindFirstChild("MapContainer", true) until mapContainer
 	
 	mapContainer = mapContainer:Clone()
 	
