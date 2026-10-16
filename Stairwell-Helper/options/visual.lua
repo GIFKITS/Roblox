@@ -60,19 +60,8 @@ local function visualizePath(targetVector: Vector3)
 		attach.Parent = workspace
 		attach.Name = "PathAttachment"
 		attach.WorldPosition = waypoint.Position
+		attach.Visible = true
 		table.insert(pathDebris, attach)
-		
-		if not pathDebris[index-1] then continue end
-		
-		local beam = Instance.new("Beam")
-		beam.LightInfluence = 0
-		beam.Brightness = 5
-		beam.Color = ColorSequence.new(Color3.fromRGB(0, 255, 0))
-		beam.Transparency = NumberSequence.new(0)
-		
-		beam.Attachment0 = pathDebris[index-1]
-		beam.Attachment1 = attach
-		beam.Parent = attach
 	end
 end
 
