@@ -1,6 +1,7 @@
 local gifscript = getgenv().gifscript
 local char = gifscript.char
 
+local collectionService = game:GetService("CollectionService")
 local runService = game:GetService("RunService")
 local lighting = game:GetService("Lighting")
 local pathfinding = game:GetService("PathfindingService")
@@ -111,6 +112,26 @@ end})
 
 visualTab:AddSection("ESP")
 
+local function removeEsp(name)
+	local espTable = collectionService:GetTagged("esp_"..tostring(name))
+	for _,esp in pairs(espTable) do
+		if esp:IsA("Highlight") then esp:Destroy() else esp:RemoveTag("esp_"..tostring(name)) end
+	end
+end
+
+local function addEsp(object: Instance, name, color: Color3)
+	if not object or object:HasTag("esp_"..tostring(name)) then return end
+	local esp = Instance.new("Highlight", object)
+	esp.Name = "esp_"..tostring(name)
+	esp.OutlineTransparency = 1
+	esp.FillTransparency = 0.5
+	esp.FillColor = color or Color3.new(0, 1, 0)
+	esp.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+	object:AddTag("esp_"..tostring(name))
+	esp:AddTag("esp_"..tostring(name))
+end
+
+local espFireAlarmToggle = visualTab:AddToggle("espFireAlarmToggle", {Title = "ESP Fire Alarm", Description = "allows you to see through walls", Default = false})
 
 -- Connections--
 
@@ -125,4 +146,8 @@ end))
 
 table.insert(gifscript.connections, runService.RenderStepped:Connect(function()
 	if fullbrightToggle.Value then lighting.Ambient = fullbrightColor.Value end
+	
+	if espFireAlarmToggle.Value then
+		addEsp(getFireAlarm(), "fireAlarm", Color3.new(1, 0, 0))
+	end
 end))
