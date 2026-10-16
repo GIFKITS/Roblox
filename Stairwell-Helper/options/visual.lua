@@ -21,6 +21,7 @@ visualTab:AddSection("Landing")
 
 local landingMap = nil
 local playerMarker = nil
+local exitMarker = nil
 local exitSign = nil
 
 local landingMapGui = Instance.new("ScreenGui", game.CoreGui)
@@ -42,11 +43,8 @@ end
 
 local function updatePlayerMarker()
 	if not playerMarker or not exitSign or not char.checkCharacter() then return end
-	
-	local playerPos: Vector3 = char.root.Position - exitSign.Position
-	local markerPos = UDim2.fromOffset(playerPos.X, playerPos.Z)
-	
-	playerMarker.Position = markerPos
+	local delta: Vector3 = char.root.Position - exitSign.Position
+	playerMarker.Position = exitMarker.Position + UDim2.fromOffset(delta.X * 1, delta.Z * 1)
 end
 
 local function updateLandingMap()
@@ -67,8 +65,9 @@ local function updateLandingMap()
 	for _,element in pairs(mapContainer:GetChildren()) do
 		if element:IsA("Frame") and element.Name == "Wall" then element.Size = UDim2.fromScale(element.Size.X.Scale, 0.0045) end
 	end
-		
+	
 	exitSign = currentLanding:FindFirstChild("ExitSign", true)
+	exitMarker = mapContainer:FindFirstChild("Marker_Exit")
 	playerMarker = mapContainer:FindFirstChild("Marker_YouAreHere")
 	landingMap = mapContainer
 end
