@@ -43,6 +43,15 @@ local function visualizePath(targetVector: Vector3)
 	local success, err = pcall(function()
 		path:ComputeAsync(char.root.Position, targetVector)
 	end)
+	
+	if not success then
+		warn(err, success)
+	end
+	if err then
+		warn(err, success)
+	end
+	warn(path.Status.Name)
+	
 	if not success or path.Status == Enum.PathStatus.NoPath then lib:Notify({Title = "Error", Content = "path computing error", Duration = 5}) return end
 	local waypoints = path:GetWaypoints()
 	
@@ -79,7 +88,7 @@ end
 
 local fireAlarmPathFindToggle = visualTab:AddToggle("fireAlarmPathFindToggle", {Title = "Compute Path To Fire Alarm", Description = "leads the way to the fire alarm", Default = false, Callback = function(value)
 	if value then
-		visualizePath(Vector3.new(326.878876, 69.5956726, -138.733398))
+		visualizePath(Vector3.new(326.878876, 69, -138.733398))
 	else
 		removePathDebris()
 	end
