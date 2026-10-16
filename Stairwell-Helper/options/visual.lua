@@ -20,9 +20,13 @@ local fullbrightColor = visualTab:AddColorpicker("fullbrightColor", {Title = "Fu
 visualTab:AddSection("Landing")
 
 local landingMap = nil
+
 local playerMarker = nil
 local exitMarker = nil
 local exitSign = nil
+local mapWorldCFrame = nil
+local pixelsX = nil
+local pixelsZ = nil
 
 local landingMapGui = Instance.new("ScreenGui", game.CoreGui)
 landingMapGui.Enabled = false
@@ -42,9 +46,10 @@ local function getCurrentLanding()
 end
 
 local function updatePlayerMarker()
-	if not playerMarker or not exitSign or not char.checkCharacter() then return end
-	local delta: Vector3 = char.root.Position - exitSign.Position
-	playerMarker.Position = exitMarker.Position + UDim2.fromOffset(delta.X * 1, delta.Z * 1)
+	if not playerMarker or not exitSign or not mapWorldCFrame or not char.checkCharacter() then return end
+	
+	local delta: Vector3 = mapWorldCFrame:VectorToObjectSpace(char.root.Position - exitSign.Position)
+	playerMarker.Position = exitMarker.Position + UDim2.fromOffset(delta.X * pixelsX, delta.Z * pixelsZ)
 end
 
 local function updateLandingMap()
@@ -62,14 +67,25 @@ local function updateLandingMap()
 	mapContainer.Parent = landingMapHandler
 	mapContainer.Rotation = 0
 	
-	for _,element in pairs(mapContainer:GetChildren()) do
+	for _,element: Instance in pairs(mapContainer:GetChildren()) do
+		if element:IsA("ImageLabel") then element.Rotation = 0 end
 		if element:IsA("Frame") and element.Name == "Wall" then element.Size = UDim2.fromScale(element.Size.X.Scale, 0.0045) end
 	end
+	
+	landingMap = mapContainer
 	
 	exitSign = currentLanding:FindFirstChild("ExitSign", true)
 	exitMarker = mapContainer:FindFirstChild("Marker_Exit")
 	playerMarker = mapContainer:FindFirstChild("Marker_YouAreHere")
-	landingMap = mapContainer
+	playerMarker.AnchorPoint = Vector2.new(0.5, 1)
+	
+	local worldCFrame, worldSize = currentLanding:GetBoundingBox()
+	local mapSize = mapContainer.AbsoluteSize
+
+	mapWorldCFrame = worldCFrame
+	
+	pixelsX = mapSize.X / worldSize.X
+	pixelsZ = mapSize.Y / worldSize.Z
 end
 
 local showLandingMapToggle = visualTab:AddToggle("showLandingMapToggle", {Title = "Show Landing Map", Description = "displays a landing map in the center of your screen", Default = false, Callback = function(value)
