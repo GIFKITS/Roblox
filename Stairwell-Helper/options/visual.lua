@@ -65,11 +65,10 @@ local function updateLandingMap()
 	mapContainer.Rotation = 0
 	
 	for _,element in pairs(mapContainer:GetChildren()) do
-		if element:IsA("ImageLabel") then element.Rotation = 0 end
 		if element:IsA("Frame") and element.Name == "Wall" then element.Size = UDim2.fromScale(element.Size.X.Scale, 0.0045) end
 	end
 		
-	exitSign = currentLanding:FindFirstChild("ExitSign")
+	exitSign = currentLanding:FindFirstChild("ExitSign", true)
 	playerMarker = mapContainer:FindFirstChild("Marker_YouAreHere")
 	landingMap = mapContainer
 end
