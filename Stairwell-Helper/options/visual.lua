@@ -136,6 +136,9 @@ end
 local espFireAlarmToggle = visualTab:AddToggle("espFireAlarmToggle", {Title = "ESP Fire Alarm", Description = "allows you to see through walls", Default = false, Callback = function(value)
 	if not value then removeEsp("fireAlarm") end
 end})
+local espCreakToggle = visualTab:AddToggle("espCreakToggle", {Title = "ESP Creak", Description = "allows you to see through walls", Default = false, Callback = function(value)
+	if not value then removeEsp("creak") end
+end})
 
 -- Connections--
 
@@ -154,5 +157,8 @@ table.insert(gifscript.connections, runService.RenderStepped:Connect(function()
 	
 	if espFireAlarmToggle.Value then
 		addEsp(getFireAlarm(), "fireAlarm", Color3.new(1, 0, 0))
+	end
+	if espCreakToggle.Value then
+		addEsp(getFireAlarm(), "creak", Color3.new(1, 0, 0))
 	end
 end))
