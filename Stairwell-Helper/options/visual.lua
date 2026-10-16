@@ -78,8 +78,8 @@ end)
 
 table.insert(gifscript.connections, char.player.AttributeChanged:Connect(function(name)
 	if name ~= "CurrentRoom" then return end
-	landingMapGui.Enabled = (getCurrentLanding() and showLandingMapToggle.Value) and true or false
-	if landing ~= getCurrentLanding() then updateLandingMap() end
+	landingMapGui.Enabled = (showLandingMapToggle.Value and getCurrentLanding()) and true or false
+	updateLandingMap()
 end))
 
 table.insert(gifscript.connections, runService.RenderStepped:Connect(function()
