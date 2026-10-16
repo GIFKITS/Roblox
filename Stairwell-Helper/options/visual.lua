@@ -159,6 +159,6 @@ table.insert(gifscript.connections, runService.RenderStepped:Connect(function()
 		addEsp(getFireAlarm(), "fireAlarm", Color3.new(1, 0, 0))
 	end
 	if espCreakToggle.Value then
-		addEsp(getFireAlarm(), "creak", Color3.new(1, 0, 0))
+		addEsp(workspace.LiveEntities:FindFirstChild("Creak"), "creak", Color3.new(1, 0, 0))
 	end
 end))
