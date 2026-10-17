@@ -71,7 +71,7 @@ local function visualizePath(targetVector: Vector3)
 	path = pathfinding:CreatePath(agentParams)
 	
 	local success, err = pcall(function()
-		path:ComputeAsync(getExitVector(), targetVector)
+		path:ComputeAsync(char.root.Position, targetVector)
 	end)
 	
 	if not success or path.Status == Enum.PathStatus.NoPath then lib:Notify({Title = "Error", Content = tostring(err), Duration = 5}) return end
