@@ -136,8 +136,14 @@ end
 local espFireAlarmToggle = visualTab:AddToggle("espFireAlarmToggle", {Title = "ESP Fire Alarm", Description = "allows you to see through walls", Default = false, Callback = function(value)
 	if not value then removeEsp("fireAlarm") end
 end})
+local espItemsToggle = visualTab:AddToggle("espItemsToggle", {Title = "ESP Items", Description = "allows you to see through walls", Default = false, Callback = function(value)
+	if not value then removeEsp("item") end
+end})
 local espCreakToggle = visualTab:AddToggle("espCreakToggle", {Title = "ESP Creak", Description = "allows you to see through walls", Default = false, Callback = function(value)
 	if not value then removeEsp("creak") end
+end})
+local espNoiseToggle = visualTab:AddToggle("espNoiseToggle", {Title = "ESP Noise", Description = "allows you to see through walls", Default = false, Callback = function(value)
+	if not value then removeEsp("noise") end
 end})
 
 -- Connections--
@@ -160,5 +166,14 @@ table.insert(gifscript.connections, runService.RenderStepped:Connect(function()
 	end
 	if espCreakToggle.Value then
 		addEsp(workspace.LiveEntities:FindFirstChild("Creak"), "creak", Color3.new(1, 0, 0))
+	end
+	if espNoiseToggle.Value then
+		addEsp(workspace:FindFirstChild("TV_Stand", true), "noise", Color3.new(1, 1, 1))
+		addEsp(workspace.CurrentCamera:FindFirstChild("NoiseModel", true), "noise", Color3.new(1, 0, 0))
+	end
+	if espItemsToggle.Value then
+		for _,item in pairs(collectionService:GetTagged("Salvage")) do
+			addEsp(item, "item", Color3.new(0, 1, 0))
+		end
 	end
 end))
