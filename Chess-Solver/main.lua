@@ -87,7 +87,7 @@ end
 
 local solveToken = 0
 
-local function computeNextMove()
+function computeNextMove()
 	local current = app.session
 	if not current or current.over or not autoSolvingToggle.Value or current.engine.side ~= current.myColor then return end
 
