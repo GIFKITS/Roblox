@@ -1,6 +1,7 @@
 local gifscript = getgenv().gifscript
 
 local replicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local players = game:GetService("Players")
 
 local ui = gifscript.ui
@@ -11,7 +12,10 @@ local solverTab = tabs.solver
 -- Modules --
 
 local app = require(replicatedStorage:WaitForChild("ChessClient"):WaitForChild("App"))
+local engine = require(replicatedStorage:WaitForChild("Chess"):WaitForChild("Engine"))
+
 local session = app.session
+local myColor = session and session.myColor
 
 -- Gui --
 
@@ -22,31 +26,39 @@ local chessUI = playerGui:WaitForChild("ChessUI")
 local boardFrame = chessUI:WaitForChild("Root"):WaitForChild("Board")
 local piecesFrame = boardFrame:WaitForChild("Pieces")
 
--- Pieces --
+-- Func --
 
-local piecesId = {
-	["rbxassetid://130108347060797"] = {"Pawn", "white"},
-	["rbxassetid://111025513068016"] = {"Knight", "white"},
-	["rbxassetid://85269847273836"] = {"Bishop", "white"},
-	["rbxassetid://133288029788689"] = {"Rook", "white"},
-	["rbxassetid://128494764910602"] = {"Queen", "white"},
-	["rbxassetid://108253639129512"] = {"King", "white"},
-	["rbxassetid://71167246324478"] = {"Pawn", "black"},
-	["rbxassetid://104573159846789"] = {"Knight", "black"},
-	["rbxassetid://72796651173850"] = {"Bishop", "black"},
-	["rbxassetid://92908975354335"] = {"Rook", "black"},
-	["rbxassetid://87797543393819"] = {"Queen", "black"},
-	["rbxassetid://99364349373891"] = {"King", "black"},
-}
+local function getPositions()
+	return session.positions[session.viewPly]
+end
+
+-- Pieces --
 
 local allPieces = {}
 local myPieces = {}
 local enemyPieces = {}
 
 local function updatePieces()
+	table.clear(allPieces)
+	table.clear(myPieces)
+	table.clear(enemyPieces)
 	
+	session = app.session
+	myColor = session and session.myColor
+	
+	for index, id in pairs(getPositions()) do
+		local piece = {index = index, square = engine.index64ToAlg(index), id = id}
+		table.insert(allPieces, piece)
+		if math.sign(id) == myColor then table.insert(myPieces, piece) else table.insert(enemyPieces, piece) end
+	end
+	
+	warn("updated")
 end
 
-table.insert(gifscript.connections, game:GetService("RunService").Heartbeat:Connect(function()
-	warn(session)
+updatePieces()
+
+-- Run --
+
+table.insert(gifscript.connections, RunService.Heartbeat:Connect(function()
+	if app.session ~= session or (session and session.myColor) ~= myColor then updatePieces() end
 end))
