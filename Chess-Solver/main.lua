@@ -27,7 +27,7 @@ local chessUI = playerGui:WaitForChild("ChessUI")
 local boardFrame = chessUI:WaitForChild("Root"):WaitForChild("Board")
 local piecesFrame = boardFrame:WaitForChild("Pieces")
 
--- Func --
+-- Helpers --
 
 local function getPositions()
 	return session.positions[session.viewPly]
@@ -37,13 +37,17 @@ local function isFlipped()
 	return app.flipOverride
 end
 
+-- UI --
+
+local autoSolvingToggle = solverTab:AddToggle("autoSolvingToggle", {Title = "Auto Solve", Description = "automatically calculates your next best move", Default = false})
+
 -- Pieces --
 
 local allPieces = {}
 local myPieces = {}
 local enemyPieces = {}
 
-local function updatePieces()
+function updatePieces()
 	table.clear(allPieces)
 	table.clear(myPieces)
 	table.clear(enemyPieces)
@@ -59,17 +63,22 @@ local function updatePieces()
 	end
 end
 
-local function updateMove()
+function updateMove()
 	local currentSession = app.session
-	if not currentSession then return end
+	
+	if not currentSession or not autoSolvingToggle.Value then return end
 	if currentSession == session and currentSession.viewPly == viewPly and #currentSession.ucis == moves then return end
 	if session.engine.side ~= session.myColor then return end
 	
-	warn("update")
 	updatePieces()
+	computeNextMove()
 end
 
-updatePieces()
+-- Solver --
+
+function computeNextMove()
+	warn("updated")
+end
 
 -- Run --
 
