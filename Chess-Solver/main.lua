@@ -44,46 +44,31 @@ end
 -- UI --
 
 local autoPlayingToggle = solverTab:AddToggle("autoPlayingToggle", {Title = "Auto Solve And Play", Description = "automatically calculates your next best move and makes it", Default = false, Callback = function(value)
-	updateMove(true)
+	if value then updateMove(true) end
 end})
 
 local highlightNextMove = solverTab:AddToggle("highlightNextMove", {Title = "Auto Solve And Highlight", Description = "automatically calculates your next best move and highlights it", Default = false, Callback = function(value)
-	updateMove(true)
+	if not autoPlayingToggle.Value and value then updateMove(true) end
 	if not value then app.board:setArrow("highlight", nil) end
 end})
 
 -- Pieces --
-
-local allPieces = {}
-local myPieces = {}
-local enemyPieces = {}
-
-function updatePieces()
-	table.clear(allPieces)
-	table.clear(myPieces)
-	table.clear(enemyPieces)
-	
-	session = app.session
-	viewPly = session and session.viewPly
-	moves = session and #session.ucis
-	
-	for index, id in pairs(getPositions()) do
-		if id == 0 then continue end
-		local piece = {index = index, square = engine.index64ToAlg(index), id = id}
-		table.insert(allPieces, piece)
-		if math.sign(id) == session.myColor then table.insert(myPieces, piece) else table.insert(enemyPieces, piece) end
-	end
-end
 
 function updateMove(updateExist: boolean)
 	local currentSession = app.session
 	
 	if not currentSession then return end
 	if not updateExist and currentSession == session and currentSession.viewPly == viewPly and #currentSession.ucis == moves then return end
-	if currentSession.engine.side ~= currentSession.myColor then return end
 	
-	updatePieces()
-	app.board:setArrow("highlight", nil)
+	if currentSession.engine.side ~= currentSession.myColor then
+		return
+	else
+		app.board:setArrow("highlight", nil)
+	end
+	
+	session = app.session
+	viewPly = session and session.viewPly
+	moves = session and #session.ucis
 	
 	if not autoPlayingToggle.Value and not highlightNextMove.Value then return end
 	
