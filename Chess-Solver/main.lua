@@ -15,6 +15,8 @@ local app = require(replicatedStorage:WaitForChild("ChessClient"):WaitForChild("
 local engine = require(replicatedStorage:WaitForChild("Chess"):WaitForChild("Engine"))
 local bot = require(replicatedStorage:WaitForChild("Chess"):WaitForChild("VortexBot"))
 
+local solveToken = 0
+
 local session = app.session
 local viewPly = session and session.viewPly
 local moves = session and #session.ucis
@@ -30,9 +32,9 @@ local piecesFrame = boardFrame:WaitForChild("Pieces")
 
 -- Helpers --
 
-local function moveTo(from, to, transform)
-	warn("move")
-	app.onBoardMove(engine.algToIndex64(from), engine.algToIndex64(to), transform or 0, false)
+local function moveTo(from, to, promotion)
+	if not from or not to then return end
+	app.onBoardMove(engine.algToIndex64(from), engine.algToIndex64(to), promotion or 0, false)
 end
 
 local function getPositions()
@@ -45,7 +47,11 @@ end
 
 -- UI --
 
-local autoSolvingToggle = solverTab:AddToggle("autoSolvingToggle", {Title = "Auto Solve", Description = "automatically calculates your next best move", Default = false, Callback = function()
+local autoPlayingToggle = solverTab:AddToggle("autoPlayingToggle", {Title = "Auto Solve", Description = "automatically calculates your next best move and makes it", Default = false, Callback = function()
+	updateMove(true)
+end})
+
+local highlightNextMove = solverTab:AddToggle("highlightNextMove", {Title = "Auto Solve", Description = "automatically calculates your next best move and highlights it", Default = false, Callback = function()
 	updateMove(true)
 end})
 
@@ -75,42 +81,42 @@ end
 function updateMove(updateExist: boolean)
 	local currentSession = app.session
 	
-	if not currentSession or not autoSolvingToggle.Value then return end
+	if not currentSession then return end
 	if not updateExist and currentSession == session and currentSession.viewPly == viewPly and #currentSession.ucis == moves then return end
 	if currentSession.engine.side ~= currentSession.myColor then return end
 	
 	updatePieces()
-	computeNextMove()
+	
+	computeNextMove(function(from, to, promotion)
+		if autoPlayingToggle.Value then
+			moveTo(from, to, promotion)
+		end
+		if highlightNextMove.Value then
+			
+		end
+	end)
 end
 
 -- Solver --
 
-local solveToken = 0
-
-function computeNextMove()
-	local current = app.session
-	if not current or current.over or not autoSolvingToggle.Value or current.engine.side ~= current.myColor then return end
+function computeNextMove(callback)
+	if not session or session.over then return end
 
 	solveToken += 1
 	local token = solveToken
 
 	task.spawn(function()
 		local success, result = pcall(function()
-			return bot.analyse(current.startFen, table.clone(current.ucis), 2, 24)
+			return bot.analyse(session.startFen, table.clone(session.ucis), 2, 24)
 		end)
-
-		if not success then
-			warn("[Solver] Analysis failed:", result)
-			return
-		end
-
-		if token ~= solveToken or not autoSolvingToggle.Value or app.session ~= current or current.over or current.engine.side ~= current.myColor then return end
+		if not success then return end
+		if token ~= solveToken or not autoSolvingToggle.Value or app.session ~= session or session.over or session.engine.side ~= session.myColor then return end
 
 		local best = result and result.best
 		if type(best) ~= "string" or #best < 4 then return end
 
 		local promotion = ({q = 5, r = 4, b = 3, n = 2})[best:sub(5, 5)] or 0
-		moveTo(best:sub(1, 2), best:sub(3, 4), promotion)
+		if callback then callback(best:sub(1, 2), best:sub(3, 4), promotion) end
 	end)
 end
 
