@@ -17,7 +17,7 @@ local engine = require(replicatedStorage:WaitForChild("Chess"):WaitForChild("Eng
 local bot = require(replicatedStorage:WaitForChild("Chess"):WaitForChild("VortexBot"))
 
 local solveToken = 0
-local thinking = false
+local thinkingThread = nil
 
 local session = app.session
 local viewPly = session and session.viewPly
@@ -81,27 +81,29 @@ end
 -- Solver --
 
 function computeNextMove(callback)
-	if not session or session.over or thinking then return end
-	thinking = true
+	if not session or session.over then return end
+	
+	if thinkingThread and coroutine.status(thinkingThread) ~= "dead" then
+		pcall(task.cancel, thinkingThread)
+	end
 	
 	solveToken += 1
 	local token = solveToken
 	
 	lib:Notify({Title = "Thinking", Content = "The bot is thinking", Duration = 2})
 
-	task.spawn(function()
+	thinkingThread = task.spawn(function()
 		local success, result = pcall(function()
 			return bot.analyse(session.startFen, table.clone(session.ucis), 2, 24)
 		end)
-		if not success then thinking = false return end
-		if token ~= solveToken or app.session ~= session or session.over or session.engine.side ~= session.myColor then thinking = false return end
+		if not success then return end
+		if token ~= solveToken or app.session ~= session or session.over or session.engine.side ~= session.myColor then return end
 
 		local best = result and result.best
-		if type(best) ~= "string" or #best < 4 then thinking = false return end
+		if type(best) ~= "string" or #best < 4 then return end
 
 		local promotion = ({q = 5, r = 4, b = 3, n = 2})[best:sub(5, 5)] or 0
 		if callback then callback(best:sub(1, 2), best:sub(3, 4), promotion) end
-		thinking = false
 	end)
 end
 
