@@ -60,7 +60,13 @@ local function updatePieces()
 end
 
 local function updateMove()
+	local currentSession = app.session
+	if not currentSession then return end
+	if currentSession == session and currentSession.viewPly == viewPly and #currentSession.ucis == moves then return end
+	if session.engine.side ~= session.myColor then return end
 	
+	warn("update")
+	updatePieces()
 end
 
 updatePieces()
@@ -68,12 +74,5 @@ updatePieces()
 -- Run --
 
 table.insert(gifscript.connections, RunService.Heartbeat:Connect(function()
-	local currentSession = app.session
-	if not currentSession then return end
-	
-	--if currentSession == session and currentSession.viewPly == viewPly and #currentSession.ucis == moves then return end
-	if currentSession == session then return end
-	
-	warn("update")
-	updatePieces()
+	updateMove()
 end))
