@@ -69,7 +69,7 @@ table.insert(gifscript.connections, RunService.Heartbeat:Connect(function()
 	local currentSession = app.session
 	if not currentSession then return end
 	
-	if currentSession.myColor == myColor and currentSession.viewPly == viewPly and #currentSession.ucis ~= moves then return end
+	if currentSession == session and currentSession.myColor == myColor and currentSession.viewPly == viewPly and #currentSession.ucis == moves then return end
 	
 	warn("update")
 	updatePieces()
