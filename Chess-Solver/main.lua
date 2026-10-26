@@ -39,7 +39,9 @@ end
 
 -- UI --
 
-local autoSolvingToggle = solverTab:AddToggle("autoSolvingToggle", {Title = "Auto Solve", Description = "automatically calculates your next best move", Default = false})
+local autoSolvingToggle = solverTab:AddToggle("autoSolvingToggle", {Title = "Auto Solve", Description = "automatically calculates your next best move", Default = false, Callback = function()
+	updateMove(true)
+end})
 
 -- Pieces --
 
@@ -63,11 +65,11 @@ function updatePieces()
 	end
 end
 
-function updateMove()
+function updateMove(updateExist: boolean)
 	local currentSession = app.session
 	
 	if not currentSession or not autoSolvingToggle.Value then return end
-	if currentSession == session and currentSession.viewPly == viewPly and #currentSession.ucis == moves then return end
+	if not updateExist and currentSession == session and currentSession.viewPly == viewPly and #currentSession.ucis == moves then return end
 	if session.engine.side ~= session.myColor then return end
 	
 	updatePieces()
