@@ -5,6 +5,7 @@ local RunService = game:GetService("RunService")
 local players = game:GetService("Players")
 
 local ui = gifscript.ui
+local lib = ui.lib
 local tabs = ui.tabs
 
 local solverTab = tabs.solver
@@ -31,11 +32,6 @@ local boardFrame = chessUI:WaitForChild("Root"):WaitForChild("Board")
 local piecesFrame = boardFrame:WaitForChild("Pieces")
 
 -- Helpers --
-
-local function moveTo(from, to, promotion)
-	if not from or not to then return end
-	app.onBoardMove(engine.algToIndex64(from), engine.algToIndex64(to), promotion or 0, false)
-end
 
 local function getPositions()
 	return session.positions[session.viewPly]
@@ -87,10 +83,13 @@ function updateMove(updateExist: boolean)
 	if currentSession.engine.side ~= currentSession.myColor then return end
 	
 	updatePieces()
+	app.board:setArrow("highlight", nil)
+	
+	if not autoPlayingToggle.Value and not highlightNextMove.Value then return end
 	
 	computeNextMove(function(from, to, promotion)
 		if autoPlayingToggle.Value then
-			moveTo(from, to, promotion)
+			app.onBoardMove(engine.algToIndex64(from), engine.algToIndex64(to), promotion or 0, false)
 		end
 		if highlightNextMove.Value then
 			app.board:setArrow("highlight", engine.algToIndex64(from), engine.algToIndex64(to), Color3.fromRGB(114, 85, 231), 0.15)
@@ -105,6 +104,8 @@ function computeNextMove(callback)
 
 	solveToken += 1
 	local token = solveToken
+	
+	lib:Notify({Title = "Thinking", Content = "The bot is thinking", Duration = 2})
 
 	task.spawn(function()
 		local success, result = pcall(function()
@@ -120,6 +121,12 @@ function computeNextMove(callback)
 		if callback then callback(best:sub(1, 2), best:sub(3, 4), promotion) end
 	end)
 end
+
+-- Unload --
+
+gifscript.onUnload.Event:Once(function()
+	app.board:setArrow("highlight", nil)
+end)
 
 -- Run --
 
