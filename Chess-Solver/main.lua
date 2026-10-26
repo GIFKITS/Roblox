@@ -17,6 +17,7 @@ local engine = require(replicatedStorage:WaitForChild("Chess"):WaitForChild("Eng
 local bot = require(replicatedStorage:WaitForChild("Chess"):WaitForChild("VortexBot"))
 
 local solveToken = 0
+local thinking = false
 
 local session = app.session
 local viewPly = session and session.viewPly
@@ -48,7 +49,7 @@ local autoPlayingToggle = solverTab:AddToggle("autoPlayingToggle", {Title = "Aut
 end})
 
 local highlightNextMove = solverTab:AddToggle("highlightNextMove", {Title = "Auto Solve And Highlight", Description = "automatically calculates your next best move and highlights it", Default = false, Callback = function(value)
-	if not autoPlayingToggle.Value and value then updateMove(true) end
+	if value then updateMove(true) end
 	if not value then app.board:setArrow("highlight", nil) end
 end})
 
@@ -59,12 +60,7 @@ function updateMove(updateExist: boolean)
 	
 	if not currentSession then return end
 	if not updateExist and currentSession == session and currentSession.viewPly == viewPly and #currentSession.ucis == moves then return end
-	
-	if currentSession.engine.side ~= currentSession.myColor then
-		return
-	else
-		app.board:setArrow("highlight", nil)
-	end
+	if currentSession.engine.side ~= currentSession.myColor then return end
 	
 	session = app.session
 	viewPly = session and session.viewPly
@@ -85,8 +81,9 @@ end
 -- Solver --
 
 function computeNextMove(callback)
-	if not session or session.over then return end
-
+	if not session or session.over or thinking then return end
+	thinking = true
+	
 	solveToken += 1
 	local token = solveToken
 	
@@ -96,14 +93,15 @@ function computeNextMove(callback)
 		local success, result = pcall(function()
 			return bot.analyse(session.startFen, table.clone(session.ucis), 2, 24)
 		end)
-		if not success then return end
-		if token ~= solveToken or app.session ~= session or session.over or session.engine.side ~= session.myColor then return end
+		if not success then thinking = false return end
+		if token ~= solveToken or app.session ~= session or session.over or session.engine.side ~= session.myColor then thinking = false return end
 
 		local best = result and result.best
-		if type(best) ~= "string" or #best < 4 then return end
+		if type(best) ~= "string" or #best < 4 then thinking = false return end
 
 		local promotion = ({q = 5, r = 4, b = 3, n = 2})[best:sub(5, 5)] or 0
 		if callback then callback(best:sub(1, 2), best:sub(3, 4), promotion) end
+		thinking = false
 	end)
 end
 
