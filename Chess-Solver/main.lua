@@ -47,12 +47,13 @@ end
 
 -- UI --
 
-local autoPlayingToggle = solverTab:AddToggle("autoPlayingToggle", {Title = "Auto Solve And Play", Description = "automatically calculates your next best move and makes it", Default = false, Callback = function()
+local autoPlayingToggle = solverTab:AddToggle("autoPlayingToggle", {Title = "Auto Solve And Play", Description = "automatically calculates your next best move and makes it", Default = false, Callback = function(value)
 	updateMove(true)
 end})
 
-local highlightNextMove = solverTab:AddToggle("highlightNextMove", {Title = "Auto Solve And Highlight", Description = "automatically calculates your next best move and highlights it", Default = false, Callback = function()
+local highlightNextMove = solverTab:AddToggle("highlightNextMove", {Title = "Auto Solve And Highlight", Description = "automatically calculates your next best move and highlights it", Default = false, Callback = function(value)
 	updateMove(true)
+	if not value then app.board:setArrow("highlight", nil) end
 end})
 
 -- Pieces --
@@ -92,7 +93,7 @@ function updateMove(updateExist: boolean)
 			moveTo(from, to, promotion)
 		end
 		if highlightNextMove.Value then
-			
+			app.board:setArrow("highlight", engine.algToIndex64(from), engine.algToIndex64(to), Color3.fromRGB(114, 85, 231), 0.15)
 		end
 	end)
 end
