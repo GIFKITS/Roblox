@@ -47,11 +47,11 @@ end
 
 -- UI --
 
-local autoPlayingToggle = solverTab:AddToggle("autoPlayingToggle", {Title = "Auto Solve", Description = "automatically calculates your next best move and makes it", Default = false, Callback = function()
+local autoPlayingToggle = solverTab:AddToggle("autoPlayingToggle", {Title = "Auto Solve And Play", Description = "automatically calculates your next best move and makes it", Default = false, Callback = function()
 	updateMove(true)
 end})
 
-local highlightNextMove = solverTab:AddToggle("highlightNextMove", {Title = "Auto Solve", Description = "automatically calculates your next best move and highlights it", Default = false, Callback = function()
+local highlightNextMove = solverTab:AddToggle("highlightNextMove", {Title = "Auto Solve And Highlight", Description = "automatically calculates your next best move and highlights it", Default = false, Callback = function()
 	updateMove(true)
 end})
 
@@ -110,7 +110,7 @@ function computeNextMove(callback)
 			return bot.analyse(session.startFen, table.clone(session.ucis), 2, 24)
 		end)
 		if not success then return end
-		if token ~= solveToken or not autoSolvingToggle.Value or app.session ~= session or session.over or session.engine.side ~= session.myColor then return end
+		if token ~= solveToken or app.session ~= session or session.over or session.engine.side ~= session.myColor then return end
 
 		local best = result and result.best
 		if type(best) ~= "string" or #best < 4 then return end
