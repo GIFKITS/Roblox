@@ -13,7 +13,7 @@ local solverTab = tabs.solver
 
 local app = require(replicatedStorage:WaitForChild("ChessClient"):WaitForChild("App"))
 local engine = require(replicatedStorage:WaitForChild("Chess"):WaitForChild("Engine"))
-local bot = require(replicatedStorage:WaitForChild("Chess"):WaitForChild("Bot"))
+local bot = require(replicatedStorage:WaitForChild("Chess"):WaitForChild("VortexBot"))
 
 local session = app.session
 local viewPly = session and session.viewPly
@@ -95,11 +95,19 @@ function computeNextMove()
 	local token = solveToken
 
 	task.spawn(function()
-		local result = bot.analyse(current.startFen, table.clone(current.ucis), 0.7, 20)
+		local success, result = pcall(function()
+			return bot.analyse(current.startFen, table.clone(current.ucis), 2, 24)
+		end)
+
+		if not success then
+			warn("[Solver] Analysis failed:", result)
+			return
+		end
+
 		if token ~= solveToken or not autoSolvingToggle.Value or app.session ~= current or current.over or current.engine.side ~= current.myColor then return end
 
 		local best = result and result.best
-		if type(best) ~= "string" then return end
+		if type(best) ~= "string" or #best < 4 then return end
 
 		local promotion = ({q = 5, r = 4, b = 3, n = 2})[best:sub(5, 5)] or 0
 		moveTo(best:sub(1, 2), best:sub(3, 4), promotion)
