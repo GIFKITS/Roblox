@@ -16,6 +16,8 @@ local engine = require(replicatedStorage:WaitForChild("Chess"):WaitForChild("Eng
 
 local session = app.session
 local myColor = session and session.myColor
+local viewPly = session and session.viewPly
+local moves = session and #session.ucis
 
 -- Gui --
 
@@ -32,6 +34,10 @@ local function getPositions()
 	return session.positions[session.viewPly]
 end
 
+local function isFlipped()
+	return app.flipOverride
+end
+
 -- Pieces --
 
 local allPieces = {}
@@ -45,14 +51,14 @@ local function updatePieces()
 	
 	session = app.session
 	myColor = session and session.myColor
+	viewPly = session and session.viewPly
+	moves = session and #session.ucis
 	
 	for index, id in pairs(getPositions()) do
 		local piece = {index = index, square = engine.index64ToAlg(index), id = id}
 		table.insert(allPieces, piece)
 		if math.sign(id) == myColor then table.insert(myPieces, piece) else table.insert(enemyPieces, piece) end
 	end
-	
-	warn("updated")
 end
 
 updatePieces()
@@ -60,5 +66,11 @@ updatePieces()
 -- Run --
 
 table.insert(gifscript.connections, RunService.Heartbeat:Connect(function()
-	if app.session ~= session or (session and session.myColor) ~= myColor then updatePieces() end
+	local currentSession = app.session
+	if not currentSession then return end
+	
+	if currentSession.myColor == myColor and currentSession.viewPly == viewPly and #currentSession.ucis ~= moves then return end
+	
+	warn("update")
+	updatePieces()
 end))
