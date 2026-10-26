@@ -1,3 +1,4 @@
+if getgenv().gifscript then warn("Script Already Running") return end
 getgenv().gifscript = {connections = {}}
 local gifscript = getgenv().gifscript
 
@@ -23,3 +24,4 @@ tabs.main:AddButton({Title = "Unload", Description = "unload the script", Callba
 table.insert(gifscript.connections, fluent.GUI.Destroying:Once(unloader))
 
 local main = loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/Roblox/refs/heads/main/Chess-Solver/main.lua"))()
+warn("Loaded")
