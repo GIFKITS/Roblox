@@ -90,11 +90,11 @@ function computeNextMove(callback)
 	solveToken += 1
 	local token = solveToken
 	
-	lib:Notify({Title = "Thinking", Content = "The bot is thinking", Duration = 5})
+	lib:Notify({Title = "Thinking", Content = "The bot is thinking", Duration = 2})
 
 	thinkingThread = task.spawn(function()
 		local success, result = pcall(function()
-			return bot.analyse(session.startFen, table.clone(session.ucis), 5, 32)
+			return bot.analyse(session.startFen, table.clone(session.ucis), 10, 32)
 		end)
 		if not success then return end
 		if token ~= solveToken or app.session ~= session or session.over or session.engine.side ~= session.myColor then return end
